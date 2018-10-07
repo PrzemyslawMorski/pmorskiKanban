@@ -1,0 +1,14 @@
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/xunit.runner.reporters.netcoreapp10.dll
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/xunit.runner.utility.netcoreapp10.dll
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/tests.deps.json
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/tests.runtimeconfig.json
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/tests.runtimeconfig.dev.json
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/tests.dll
+/home/pmorski/Desktop/pmorskiKanban/api/tests/bin/Debug/netcoreapp2.1/tests.pdb
+/home/pmorski/Desktop/pmorskiKanban/api/tests/obj/Debug/netcoreapp2.1/tests.csprojAssemblyReference.cache
+/home/pmorski/Desktop/pmorskiKanban/api/tests/obj/Debug/netcoreapp2.1/tests.csproj.CoreCompileInputs.cache
+/home/pmorski/Desktop/pmorskiKanban/api/tests/obj/Debug/netcoreapp2.1/tests.AssemblyInfoInputs.cache
+/home/pmorski/Desktop/pmorskiKanban/api/tests/obj/Debug/netcoreapp2.1/tests.AssemblyInfo.cs
+/home/pmorski/Desktop/pmorskiKanban/api/tests/obj/Debug/netcoreapp2.1/tests.dll
+/home/pmorski/Desktop/pmorskiKanban/api/tests/obj/Debug/netcoreapp2.1/tests.pdb

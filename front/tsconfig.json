@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react",
+    "declaration": true,
+    "lib": ["es6", "dom"],
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "rootDir": ".",
+    "strict": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
