@@ -1,12 +1,12 @@
-using System;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace tests
+namespace integration
 {
     public class UnitTest1
     {
         [Fact]
-        public void Test1()
+        public async Task Test1()
         {
         }
     }

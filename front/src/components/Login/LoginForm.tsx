@@ -1,4 +1,4 @@
-import {Button, FormGroup, InputGroup} from "@blueprintjs/core";
+import { Button, Classes, FormGroup, InputGroup } from "@blueprintjs/core";
 import * as React from "react";
 import {connect} from "react-redux";
 import {isEmail} from "../../shared-components/helper-functions/isEmail";
@@ -51,7 +51,7 @@ class LoginFormComponent extends React.Component {
             />
           </FormGroup>
 
-          <input type="submit" value="Log in" className="bp3-button bp3-intent-success"/>
+          <input type="submit" value="Log in" className={`${Classes.BUTTON} ${Classes.INTENT_SUCCESS}`}/>
 
           <br/>
           <Button text="Log in with Google"/>
@@ -72,21 +72,21 @@ class LoginFormComponent extends React.Component {
   private handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    let error = false;
+    // let error = false;
 
     if (!isEmail(this.state.email) || this.state.email === "") {
       this.setState({emailError: true});
-      error = true;
+      // error = true;
     }
 
     if (this.state.password === "") {
       this.setState({passwordError: true});
-      error = true;
+      // error = true;
     }
 
-    if (!error) {
-      console.log("cool");
-    }
+    // if (!error) {
+      // console.log("cool");
+    // }
   }
 
   private emailHelperText(): string {
