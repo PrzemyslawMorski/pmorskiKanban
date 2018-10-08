@@ -29,7 +29,8 @@ namespace api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("MemoryDb"));
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(_config.GetConnectionString("KanbanDatabase")));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
 

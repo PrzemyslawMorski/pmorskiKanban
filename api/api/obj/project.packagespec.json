@@ -41,7 +41,7 @@
         "Microsoft.NETCore.App": {
           "suppressParent": "All",
           "target": "Package",
-          "version": "[2.1.0-preview2-26406-04, )",
+          "version": "[2.1.0, )",
           "autoReferenced": true
         },
         "Swashbuckle.AspNetCore.Swagger": {
@@ -55,6 +55,10 @@
         "Swashbuckle.AspNetCore.SwaggerUI": {
           "target": "Package",
           "version": "[3.0.0, )"
+        },
+        "System.Configuration.ConfigurationManager": {
+          "target": "Package",
+          "version": "[4.5.0, )"
         }
       },
       "imports": [

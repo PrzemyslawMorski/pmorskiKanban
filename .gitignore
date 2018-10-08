@@ -1,0 +1,41 @@
+**/*.suo
+**/*.user
+**/*.userosscache
+**/*.sln.docstates
+
+# Build results
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/x64/
+**/x86/
+**/bld/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+
+**/.vs/
+
+# .NET Core
+**/project.lock.json
+**/project.fragment.lock.json
+**/artifacts/
+
+# JetBrains Rider
+**/.idea/
+*.sln.iml
+api/.idea
+
+**/.DS_STORE
+**/node_modules
+**/dist/
+**/*.log*
+**/chrome-user-data
+**/*.sublime-project
+**/*.sublime-workspace
+**/**/.idea
+**/*.iml
+**/.vscode
+**/*.swp
+**/*.swo
