@@ -14,11 +14,7 @@
     ],
     "frameworks": {
       "netcoreapp2.1": {
-        "projectReferences": {
-          "/home/pmorski/Desktop/pmorskiKanban/api/services/services.csproj": {
-            "projectPath": "/home/pmorski/Desktop/pmorskiKanban/api/services/services.csproj"
-          }
-        }
+        "projectReferences": {}
       }
     },
     "warningProperties": {
@@ -30,6 +26,14 @@
   "frameworks": {
     "netcoreapp2.1": {
       "dependencies": {
+        "AutoMapper": {
+          "target": "Package",
+          "version": "[7.0.1, )"
+        },
+        "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+          "target": "Package",
+          "version": "[5.0.1, )"
+        },
         "Microsoft.AspNetCore.App": {
           "target": "Package",
           "version": "[2.1.0-preview2-final, )"

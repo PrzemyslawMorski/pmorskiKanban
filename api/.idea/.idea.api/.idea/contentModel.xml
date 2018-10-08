@@ -9,11 +9,40 @@
     <e p="$PROJECT_DIR$" t="IncludeFlat">
       <e p="api" t="IncludeRecursive">
         <e p="Controllers" t="Include">
-          <e p="TokenController.cs" t="Include" />
+          <e p="UsersController.cs" t="Include" />
+        </e>
+        <e p="Data" t="Include">
+          <e p="DataContext.cs" t="Include" />
+          <e p="Dtos" t="Include">
+            <e p="User" t="Include">
+              <e p="ChangeNameEmailDto.cs" t="Include" />
+              <e p="ChangePasswordDto.cs" t="Include" />
+              <e p="DeleteAccountDto.cs" t="Include" />
+              <e p="ForgotPasswordDto.cs" t="Include" />
+              <e p="LoginDto.cs" t="Include" />
+              <e p="RegisterDto.cs" t="Include" />
+              <e p="UserDto.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Entities" t="Include">
+            <e p="User.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Helpers" t="Include">
+          <e p="AppException.cs" t="Include" />
+          <e p="AppSettings.cs" t="Include" />
+          <e p="AutoMapperProfile.cs" t="Include" />
+          <e p="Startup" t="Include">
+            <e p="Configure.cs" t="Include" />
+            <e p="ConfigureServices.cs" t="Include" />
+          </e>
         </e>
         <e p="Program.cs" t="Include" />
         <e p="Properties" t="Include">
           <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Services" t="Include">
+          <e p="UserService.cs" t="Include" />
         </e>
         <e p="Startup.cs" t="Include" />
         <e p="api.csproj" t="IncludeRecursive" />
@@ -30,40 +59,7 @@
         <e p="wwwroot" t="Include" />
       </e>
       <e p="api.sln" t="IncludeFlat" />
-      <e p="data" t="IncludeRecursive">
-        <e p="KanbanContext.cs" t="Include" />
-        <e p="Models" t="Include">
-          <e p="Board.cs" t="Include" />
-          <e p="Login.cs" t="Include" />
-          <e p="User.cs" t="Include" />
-        </e>
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="data.csproj" t="IncludeRecursive" />
-        <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp2.1" t="Include">
-              <e p="data.AssemblyInfo.cs" t="Include" />
-            </e>
-          </e>
-        </e>
-      </e>
       <e p="packages" t="ExcludeRecursive" />
-      <e p="services" t="IncludeRecursive">
-        <e p="Authentication" t="Include">
-          <e p="AuthenticateUser.cs" t="Include" />
-          <e p="BuildJWT.cs" t="Include" />
-        </e>
-        <e p="Class1.cs" t="Include" />
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp2.1" t="Include">
-              <e p="services.AssemblyInfo.cs" t="Include" />
-            </e>
-          </e>
-        </e>
-        <e p="services.csproj" t="IncludeRecursive" />
-      </e>
       <e p="tests" t="IncludeRecursive">
         <e p="UnitTest1.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
