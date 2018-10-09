@@ -22,6 +22,10 @@ export class Navbar extends React.Component {
           <Link to="/about" style={{textDecoration: "none"}}>
             <Button className={Classes.MINIMAL} icon="info-sign" text="About"/>
           </Link>
+
+          <Link to="/login" style={{textDecoration: "none"}}>
+            <Button className={Classes.MINIMAL} icon="user" text="Account"/>
+          </Link>
         </BlueprintjsNavbar.Group>
       </BlueprintjsNavbar>
     </div>;

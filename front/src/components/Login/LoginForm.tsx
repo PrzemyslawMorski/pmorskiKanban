@@ -1,10 +1,15 @@
-import { Button, Classes, FormGroup, InputGroup } from "@blueprintjs/core";
+import {Button, Classes, FormGroup, InputGroup} from "@blueprintjs/core";
 import * as React from "react";
 import {connect} from "react-redux";
 import {isEmail} from "../../shared-components/helper-functions/isEmail";
 
 class LoginFormComponent extends React.Component {
-  public state = {email: "", password: "", emailError: false, passwordError: false};
+  public state = {
+    email: "",
+    emailError: "",
+    password: "",
+    passwordError: "",
+  };
 
   constructor(props: any, context: any) {
     super(props, context);
@@ -62,63 +67,60 @@ class LoginFormComponent extends React.Component {
   }
 
   private handleEmailChange(event: React.FormEvent) {
-    this.setState({email: (event.target as HTMLInputElement).value, emailError: false});
+    this.setState({email: (event.target as HTMLInputElement).value, emailError: ""});
   }
 
   private handlePasswordChange(event: React.FormEvent) {
-    this.setState({password: (event.target as HTMLInputElement).value, passwordError: false});
+    this.setState({password: (event.target as HTMLInputElement).value, passwordError: ""});
   }
 
   private handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    // let error = false;
+    let error = false;
 
-    if (!isEmail(this.state.email) || this.state.email === "") {
-      this.setState({emailError: true});
-      // error = true;
+    if (this.state.email === "") {
+      this.setState({emailError: "Email is required"});
+      error = true;
+    } else if (!isEmail(this.state.email)) {
+      this.setState({emailError: "Email is not a valid email"});
+      error = true;
     }
 
     if (this.state.password === "") {
-      this.setState({passwordError: true});
-      // error = true;
+      this.setState({passwordError: "Password is required"});
+      error = true;
     }
 
-    // if (!error) {
-      // console.log("cool");
-    // }
+    if (!error) {
+      this.login();
+    }
   }
 
   private emailHelperText(): string {
-    if (this.state.email === "") {
-      return "E-mail is required";
-    }
-    if (this.state.emailError) {
-      return "This is not a valid e-mail";
-    }
-    return "";
+    return this.state.emailError;
   }
 
   private emailIntent(): "none" | "primary" | "warning" | "danger" | undefined {
-    return this.state.emailError ? "danger" : "none";
+    const isEmailError = this.state.emailError !== "";
+    return isEmailError ? "danger" : "none";
   }
 
   private passwordHelperText(): string {
-    if (this.state.emailError || this.state.password !== "") {
-      return "";
-    } else if (this.state.passwordError) {
-      return "Password is required";
-    }
-    return "";
+    const previousFormFieldsHaveErrors = this.state.emailError !== "";
+    return previousFormFieldsHaveErrors ? "" : this.state.passwordError;
   }
 
   private passwordIntent(): "none" | "primary" | "warning" | "danger" | undefined {
-    if (this.state.emailError || this.state.password !== "") {
-      return "none";
-    } else if (this.state.passwordError) {
-      return "danger";
+    const previousFormFieldsNoErrors = this.state.emailError === "";
+    const isPasswordError = this.state.passwordError !== "";
+    return previousFormFieldsNoErrors && isPasswordError ? "danger" : "none";
+  }
+
+  private login() {
+    if (this.state.emailError !== "" || this.state.passwordError !== "") {
+      return;
     }
-    return "none";
   }
 }
 

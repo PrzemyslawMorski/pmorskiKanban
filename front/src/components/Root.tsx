@@ -12,7 +12,7 @@ import {Register} from "./Register/Register";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
-// import "./Root.css"; JEST doesnt know this file and breaks when testing
+import "./Root.css";
 
 const store = configureStore();
 

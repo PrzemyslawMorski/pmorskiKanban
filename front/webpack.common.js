@@ -3,9 +3,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: {
-    app: './src/index.tsx'
-  },
+  entry: ['whatwg-fetch', './src/index.tsx'],
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
