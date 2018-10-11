@@ -95,6 +95,14 @@ public interface IUserService
                 passwordError = "Password is required.";
             }
 
+            if (emailError == null ||
+                nameError == null ||
+                passwordError == null ||
+                serverError == null)
+            {
+                return;
+            }
+
             var user = _mapper.Map<User>(registerRequestDto);
 
             CreatePasswordHash(registerRequestDto.Password, out var passwordHash, out var passwordSalt);

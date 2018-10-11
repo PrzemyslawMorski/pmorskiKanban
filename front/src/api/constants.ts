@@ -1,5 +1,4 @@
-export const baseUrl = "https://localhost:44333/api/";
-
-export const throttleHttpCallsDuration = 500;
+export const baseUrl = "https://localhost:5001/api/";
 
 export const registerEndpoint = "users/register";
+export const loginEndpoint = "users/login";

@@ -4,7 +4,7 @@ export interface IRegisterRequest {
   password: string;
 }
 
-export interface IRegisterBadRequest {
+export interface IRegisterBadRequestResponse {
   emailError: string;
   nameError: string;
   passwordError: string;

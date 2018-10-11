@@ -4,8 +4,9 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {registerHttpCall} from "../../api/userService";
-import {IRegisterBadRequest, IRegisterRequest} from "../../dtos/User";
+import {IRegisterBadRequestResponse, IRegisterRequest} from "../../dtos/User";
 import {isEmail} from "../../shared-components/helper-functions/isEmail";
+import {isPassword} from "../../shared-components/helper-functions/isPassword";
 
 class RegisterFormComponent extends React.Component {
   public state = {
@@ -130,6 +131,9 @@ class RegisterFormComponent extends React.Component {
     if (this.state.password === "") {
       this.setState({passwordError: "Password is required"});
       error = true;
+    } else if (!isPassword(this.state.password)) {
+      this.setState({passwordError: "Password needs to be at least 8 characters long"});
+      error = true;
     }
 
     if (!error) {
@@ -178,42 +182,53 @@ class RegisterFormComponent extends React.Component {
         name: this.state.name,
         password: this.state.password,
       };
-      registerHttpCall(registerDto).subscribe((response: Response) => {
-        if (response.ok) {
-          Toaster.create({
-            className: "recipe-toaster",
-            position: Position.TOP,
-          }).show({
-            intent: Intent.SUCCESS,
-            message: "Registered successfully.",
-            timeout: 2000,
-          });
-          this.setState({registeredSuccessfully: true});
-        } else if (response.status === 500) {
+
+      registerHttpCall(registerDto)
+        .subscribe((response: Response) => {
+          if (response.status === 200) {
+            Toaster.create({
+              className: "recipe-toaster",
+              position: Position.TOP,
+            }).show({
+              intent: Intent.SUCCESS,
+              message: "Registered successfully.",
+              timeout: 2000,
+            });
+            this.setState({registeredSuccessfully: true});
+          } else if (response.status === 500) {
+            Toaster.create({
+              className: "recipe-toaster",
+              position: Position.TOP,
+            }).show({
+              intent: Intent.DANGER,
+              message: JSON.stringify(response.body),
+              timeout: 5000,
+            });
+          } else {
+            response.json().then((badRequest: IRegisterBadRequestResponse) => {
+              if (badRequest.emailError != null) {
+                this.setState({emailError: badRequest.emailError});
+              }
+
+              if (badRequest.nameError != null) {
+                this.setState({nameError: badRequest.nameError});
+              }
+
+              if (badRequest.passwordError != null) {
+                this.setState({passwordError: badRequest.passwordError});
+              }
+            });
+          }
+        }, () => {
           Toaster.create({
             className: "recipe-toaster",
             position: Position.TOP,
           }).show({
             intent: Intent.DANGER,
-            message: JSON.stringify(response.body),
+            message: "Our servers seem to be down. Please try again later.",
             timeout: 5000,
           });
-        } else {
-          response.json().then((badRequest: IRegisterBadRequest) => {
-            if (badRequest.emailError != null) {
-              this.setState({emailError: badRequest.emailError});
-            }
-
-            if (badRequest.nameError != null) {
-              this.setState({nameError: badRequest.nameError});
-            }
-
-            if (badRequest.passwordError != null) {
-              this.setState({passwordError: badRequest.passwordError});
-            }
-          });
-        }
-      });
+        });
     }
   }
 }
