@@ -31,35 +31,26 @@ namespace api.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto userDto)
         {
-            var user = _userService.Authenticate(userDto.Email, userDto.Password);
+            var user = _userService.Authenticate(userDto, out var emailError, out var passwordError, out var credentialsError);
 
             if (user == null)
             {
-                return BadRequest(new {message = "Email or password is incorrect"});
+                return BadRequest(new {emailError, passwordError, credentialsError});
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_appSettings.JwtSecretKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var token = _userService.BuildJWT(user);
+
+            if (token == null)
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                return StatusCode(500, "Something went wrong when logging you in. Please try again later");
+            }
 
             return Ok(new
             {
-                user.Id,
-                user.Email,
-                user.Name,
-                Token = tokenString
+                userId = user.Id,
+                userEmail = user.Email,
+                userName = user.Name,
+                token
             });
         }
 

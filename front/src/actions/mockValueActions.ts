@@ -1,4 +1,4 @@
-import { action } from "typesafe-actions";
+import {action} from "typesafe-actions";
 import * as actionTypes from "./constants";
 
 export const loadMockValue = () => action(actionTypes.LOAD_MOCK_VALUE);

@@ -1,12 +1,26 @@
-import {Button, Classes, FormGroup, InputGroup} from "@blueprintjs/core";
+import {Classes, FormGroup, InputGroup, Intent, Position, Toaster} from "@blueprintjs/core";
 import * as React from "react";
 import {connect} from "react-redux";
+import {Redirect} from "react-router";
+import {userLoggedIn} from "../../actions/userActions";
+import {ILoginBadRequestResponse, ILoginRequest, ILoginSuccessResponse} from "../../dtos/User";
+import {IUser} from "../../entities/User";
+import {ResponseStatus} from "../../services/constants";
+import {saveToken} from "../../services/tokenService";
+import {loginHttpCall} from "../../services/userService";
 import {isEmail} from "../../shared-components/helper-functions/isEmail";
+import {isPassword} from "../../shared-components/helper-functions/isPassword";
 
-class LoginFormComponent extends React.Component {
+interface ILoginFormComponentProps {
+  onLoggedIn: (user: IUser) => void;
+}
+
+class LoginFormComponent extends React.Component<ILoginFormComponentProps, {}> {
   public state = {
+    credentialsError: "",
     email: "",
     emailError: "",
+    loggedInSuccessfully: false,
     password: "",
     passwordError: "",
   };
@@ -20,6 +34,10 @@ class LoginFormComponent extends React.Component {
   }
 
   public render() {
+    if (this.state.loggedInSuccessfully) {
+      return <Redirect to="/"/>;
+    }
+
     return (
       <div>
         <form id="login-form" noValidate={true} onSubmit={this.handleSubmit}>
@@ -56,22 +74,22 @@ class LoginFormComponent extends React.Component {
             />
           </FormGroup>
 
+          {this.credentialsError()}
+
           <input type="submit" value="Log in" className={`${Classes.BUTTON} ${Classes.INTENT_SUCCESS}`}/>
 
           <br/>
-          <Button text="Log in with Google"/>
-          <Button text="Log in with Facebook"/>
         </form>
       </div>
     );
   }
 
   private handleEmailChange(event: React.FormEvent) {
-    this.setState({email: (event.target as HTMLInputElement).value, emailError: ""});
+    this.setState({email: (event.target as HTMLInputElement).value, emailError: "", credentialsError: ""});
   }
 
   private handlePasswordChange(event: React.FormEvent) {
-    this.setState({password: (event.target as HTMLInputElement).value, passwordError: ""});
+    this.setState({password: (event.target as HTMLInputElement).value, passwordError: "", credentialsError: ""});
   }
 
   private handleSubmit(event: React.FormEvent) {
@@ -89,6 +107,13 @@ class LoginFormComponent extends React.Component {
 
     if (this.state.password === "") {
       this.setState({passwordError: "Password is required"});
+      error = true;
+    } else if (!isPassword(this.state.password)) {
+      this.setState({passwordError: "Password needs to be at least 8 characters long"});
+      error = true;
+    }
+
+    if (this.state.credentialsError !== "") {
       error = true;
     }
 
@@ -117,11 +142,85 @@ class LoginFormComponent extends React.Component {
     return previousFormFieldsNoErrors && isPasswordError ? "danger" : "none";
   }
 
+  private credentialsError(): JSX.Element | null {
+    if (this.state.credentialsError === "") {
+      return null;
+    } else {
+      return <FormGroup helperText={this.state.credentialsError} intent={"danger"}/>;
+    }
+  }
+
   private login() {
     if (this.state.emailError !== "" || this.state.passwordError !== "") {
       return;
     }
+
+    const loginDto: ILoginRequest = {
+      email: this.state.email,
+      password: this.state.password,
+    };
+
+    loginHttpCall(loginDto)
+      .subscribe((response: Response) => {
+        if (response.status === ResponseStatus.Ok) {
+          response.json().then((success: ILoginSuccessResponse) => {
+            const user: IUser = {id: success.userId, name: success.userName, email: success.userEmail};
+            const token: string = success.token;
+
+            this.props.onLoggedIn(user);
+            saveToken(token);
+
+            this.setState({loggedInSuccessfully: true});
+            Toaster.create({
+              className: "recipe-toaster",
+              position: Position.TOP,
+            }).show({
+              intent: Intent.SUCCESS,
+              message: "Logged in successfully.",
+              timeout: 2000,
+            });
+          });
+        } else if (response.status === ResponseStatus.ServerError) {
+          Toaster.create({
+            className: "recipe-toaster",
+            position: Position.TOP,
+          }).show({
+            intent: Intent.DANGER,
+            message: JSON.stringify(response.body),
+            timeout: 5000,
+          });
+        } else if (response.status === ResponseStatus.BadRequest) {
+          response.json().then((badRequest: ILoginBadRequestResponse) => {
+            if (badRequest.emailError != null) {
+              this.setState({emailError: badRequest.emailError});
+            }
+
+            if (badRequest.passwordError != null) {
+              this.setState({passwordError: badRequest.passwordError});
+            }
+
+            if (badRequest.credentialsError != null) {
+              this.setState({credentialsError: badRequest.credentialsError});
+            }
+          });
+        }
+      }, () => {
+        Toaster.create({
+          className: "recipe-toaster",
+          position: Position.TOP,
+        }).show({
+          intent: Intent.DANGER,
+          message: "Our servers seem to be down. Please try again later.",
+          timeout: 5000,
+        });
+      });
   }
 }
 
-export const LoginForm = connect()(LoginFormComponent);
+const mapDispatchToProps = (dispatch: any) => {
+  return ({
+    onLoggedIn: (user: IUser) => dispatch(userLoggedIn(user)),
+  });
+};
+
+export const LoginForm = connect(null, mapDispatchToProps)(LoginFormComponent);

@@ -1,5 +1,6 @@
-import { IState } from "./storeStateInterface";
+import {IState} from "./storeStateInterface";
 
 export const initialStoreState: IState = {
-    appName: "Kanban pmorski",
+  appName: "Kanban pmorski",
+  user: {id: -1, email: "", name: ""},
 };

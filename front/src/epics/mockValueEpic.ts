@@ -6,7 +6,7 @@ import { from, Observable } from "rxjs";
 import { map, mergeMap } from "rxjs/operators";
 import { ActionType } from "typesafe-actions";
 import { LOAD_MOCK_VALUE } from "../actions/constants";
-import { MockValueApi } from "../api/mockAuthorApi";
+import { MockValueApi } from "../services/mockAuthorApi";
 
 export const mockValueEpic: Epic<Action, Action, void> = (
     action$: ActionsObservable<ActionType<typeof mockValueActions>>,

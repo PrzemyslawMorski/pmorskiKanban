@@ -1,9 +1,10 @@
-import {Button, Classes, FormGroup, InputGroup, Intent, Position, Toaster} from "@blueprintjs/core";
+import {Classes, FormGroup, InputGroup, Intent, Position, Toaster} from "@blueprintjs/core";
 import * as _ from "lodash";
 import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
-import {registerHttpCall} from "../../api/userService";
+import {ResponseStatus} from "../../services/constants";
+import {registerHttpCall} from "../../services/userService";
 import {IRegisterBadRequestResponse, IRegisterRequest} from "../../dtos/User";
 import {isEmail} from "../../shared-components/helper-functions/isEmail";
 import {isPassword} from "../../shared-components/helper-functions/isPassword";
@@ -31,7 +32,7 @@ class RegisterFormComponent extends React.Component {
 
   public render() {
     if (this.state.registeredSuccessfully) {
-      return <Redirect to="login"/>;
+      return <Redirect to="/login"/>;
     }
 
     return (
@@ -87,9 +88,6 @@ class RegisterFormComponent extends React.Component {
           </FormGroup>
 
           <input type="submit" value="Register" className={`${Classes.BUTTON} ${Classes.INTENT_SUCCESS}`}/>
-
-          <br/>
-          <Button text="Register with Google"/>
         </form>
       </div>
     );
@@ -173,63 +171,64 @@ class RegisterFormComponent extends React.Component {
   }
 
   private register() {
-    if (this.state.nameError === "" &&
-      this.state.emailError === "" &&
+    if (this.state.nameError === "" ||
+      this.state.emailError === "" ||
       this.state.passwordError === "") {
+      return;
+    }
 
-      const registerDto: IRegisterRequest = {
-        email: this.state.email,
-        name: this.state.name,
-        password: this.state.password,
-      };
+    const registerDto: IRegisterRequest = {
+      email: this.state.email,
+      name: this.state.name,
+      password: this.state.password,
+    };
 
-      registerHttpCall(registerDto)
-        .subscribe((response: Response) => {
-          if (response.status === 200) {
-            Toaster.create({
-              className: "recipe-toaster",
-              position: Position.TOP,
-            }).show({
-              intent: Intent.SUCCESS,
-              message: "Registered successfully.",
-              timeout: 2000,
-            });
-            this.setState({registeredSuccessfully: true});
-          } else if (response.status === 500) {
-            Toaster.create({
-              className: "recipe-toaster",
-              position: Position.TOP,
-            }).show({
-              intent: Intent.DANGER,
-              message: JSON.stringify(response.body),
-              timeout: 5000,
-            });
-          } else {
-            response.json().then((badRequest: IRegisterBadRequestResponse) => {
-              if (badRequest.emailError != null) {
-                this.setState({emailError: badRequest.emailError});
-              }
-
-              if (badRequest.nameError != null) {
-                this.setState({nameError: badRequest.nameError});
-              }
-
-              if (badRequest.passwordError != null) {
-                this.setState({passwordError: badRequest.passwordError});
-              }
-            });
-          }
-        }, () => {
+    registerHttpCall(registerDto)
+      .subscribe((response: Response) => {
+        if (response.status === ResponseStatus.Ok) {
+          Toaster.create({
+            className: "recipe-toaster",
+            position: Position.TOP,
+          }).show({
+            intent: Intent.SUCCESS,
+            message: "Registered successfully.",
+            timeout: 2000,
+          });
+          this.setState({registeredSuccessfully: true});
+        } else if (response.status === ResponseStatus.ServerError) {
           Toaster.create({
             className: "recipe-toaster",
             position: Position.TOP,
           }).show({
             intent: Intent.DANGER,
-            message: "Our servers seem to be down. Please try again later.",
+            message: JSON.stringify(response.body),
             timeout: 5000,
           });
+        } else if (response.status === ResponseStatus.BadRequest) {
+          response.json().then((badRequest: IRegisterBadRequestResponse) => {
+            if (badRequest.emailError != null) {
+              this.setState({emailError: badRequest.emailError});
+            }
+
+            if (badRequest.nameError != null) {
+              this.setState({nameError: badRequest.nameError});
+            }
+
+            if (badRequest.passwordError != null) {
+              this.setState({passwordError: badRequest.passwordError});
+            }
+          });
+        }
+      }, () => {
+        Toaster.create({
+          className: "recipe-toaster",
+          position: Position.TOP,
+        }).show({
+          intent: Intent.DANGER,
+          message: "Our servers seem to be down. Please try again later.",
+          timeout: 5000,
         });
-    }
+      });
   }
 }
 

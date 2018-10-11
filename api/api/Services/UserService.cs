@@ -1,26 +1,38 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Mail;
+using System.Security.Claims;
+using System.Text;
 using api.Data;
 using api.Data.Dtos.User;
 using api.Data.Entities;
 using api.Helpers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace api.Services
 {
-public interface IUserService
+    public interface IUserService
     {
-        User Authenticate(string email, string password);
+        User Authenticate(LoginDto loginRequestDto,
+            out string emailError,
+            out string passwordError,
+            out string credentialsError);
+
+        string BuildJWT(User user);
         IEnumerable<User> GetAll();
         User GetById(int id);
+
         void Create(RegisterDto registerRequestDto,
             out string emailError,
             out string nameError,
             out string passwordError,
             out string serverError);
+
         void Update(User user, string password = null);
         void Delete(int id);
     }
@@ -29,26 +41,76 @@ public interface IUserService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly AppSettings _appSettings;
 
-        public UserService(DataContext context, IMapper mapper)
+        public UserService(DataContext context, IMapper mapper, IOptions<AppSettings> appSettings)
         {
             _context = context;
             _mapper = mapper;
+            _appSettings = appSettings.Value;
         }
 
-        public User Authenticate(string email, string password)
+        public User Authenticate(LoginDto loginRequestDto, out string emailError, out string passwordError,
+            out string credentialsError)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-                return null;
+            emailError = null;
+            passwordError = null;
+            credentialsError = null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Email == email);
+            if (string.IsNullOrWhiteSpace(loginRequestDto.Email))
+            {
+                emailError = "Email is required.";
+            }
+
+            if (string.IsNullOrWhiteSpace(loginRequestDto.Email))
+            {
+                passwordError = "Password is required.";
+            }
+
+            var user = _context.Users.SingleOrDefault(x => x.Email == loginRequestDto.Email);
 
             if (user == null)
+            {
+                credentialsError = "Email or password is incorrect";
                 return null;
+            }
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) return null;
+            if (!VerifyPasswordHash(loginRequestDto.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                credentialsError = "Email or password is incorrect";
+                return null;
+            }
+
+            if (emailError != null || passwordError != null) return null;
 
             return user;
+        }
+
+        public string BuildJWT(User user)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(_appSettings.JwtSecretKey);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                    {
+                        new Claim(ClaimTypes.Email, user.Email)
+                    }),
+                    Expires = DateTime.UtcNow.AddMinutes(30),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                        SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                return tokenString;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public IEnumerable<User> GetAll()
@@ -114,7 +176,8 @@ public interface IUserService
             {
                 _context.Users.Add(user);
                 _context.SaveChanges();
-            } catch(DbUpdateException)
+            }
+            catch (DbUpdateException)
             {
                 serverError = "There's something wrong with our database. Please try again later.";
             }
@@ -172,22 +235,22 @@ public interface IUserService
         {
             if (password == null)
             {
-                throw new ArgumentNullException(nameof(password));
+                return false;
             }
 
             if (string.IsNullOrWhiteSpace(password))
             {
-                throw new ArgumentException("Value cannot be empty or whitespace only string.", nameof(password));
+                return false;
             }
 
             if (storedHash.Length != 64)
             {
-                throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
+                return false;
             }
 
             if (storedSalt.Length != 128)
             {
-                throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
+                return false;
             }
 
             using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
