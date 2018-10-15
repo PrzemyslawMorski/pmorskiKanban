@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
 namespace api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20181015132416_board-column-task-tag")]
+    partial class boardcolumntasktag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,10 +86,6 @@ namespace api.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.Property<int>("NextColumnId");
-
-                    b.Property<int>("PreviousColumnId");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
@@ -125,34 +123,17 @@ namespace api.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.Property<int>("NextTaskId");
-
-                    b.Property<int>("PreviousTaskId");
+                    b.Property<int?>("NextTaskId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ColumnId");
 
+                    b.HasIndex("NextTaskId")
+                        .IsUnique()
+                        .HasFilter("[NextTaskId] IS NOT NULL");
+
                     b.ToTable("Task");
-                });
-
-            modelBuilder.Entity("api.Data.Entities.TaskAssignedToUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("AssignedUserId");
-
-                    b.Property<int?>("TaskId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedUserId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("TaskAssignedToUser");
                 });
 
             modelBuilder.Entity("api.Data.Entities.User", b =>
@@ -225,17 +206,10 @@ namespace api.Migrations
                         .WithMany("Tasks")
                         .HasForeignKey("ColumnId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
 
-            modelBuilder.Entity("api.Data.Entities.TaskAssignedToUser", b =>
-                {
-                    b.HasOne("api.Data.Entities.User", "AssignedUser")
-                        .WithMany("AssignedTasks")
-                        .HasForeignKey("AssignedUserId");
-
-                    b.HasOne("api.Data.Entities.Task", "Task")
-                        .WithMany("Assignees")
-                        .HasForeignKey("TaskId");
+                    b.HasOne("api.Data.Entities.Task", "NextTask")
+                        .WithOne("PreviousTask")
+                        .HasForeignKey("api.Data.Entities.Task", "NextTaskId");
                 });
 #pragma warning restore 612, 618
         }

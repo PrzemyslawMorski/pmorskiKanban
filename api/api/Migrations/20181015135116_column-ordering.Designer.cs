@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
 namespace api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20181015135116_column-ordering")]
+    partial class columnordering
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,25 +138,6 @@ namespace api.Migrations
                     b.ToTable("Task");
                 });
 
-            modelBuilder.Entity("api.Data.Entities.TaskAssignedToUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("AssignedUserId");
-
-                    b.Property<int?>("TaskId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedUserId");
-
-                    b.HasIndex("TaskId");
-
-                    b.ToTable("TaskAssignedToUser");
-                });
-
             modelBuilder.Entity("api.Data.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -173,7 +156,11 @@ namespace api.Migrations
 
                     b.Property<byte[]>("PasswordSalt");
 
+                    b.Property<int?>("TaskId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
 
                     b.ToTable("Users");
                 });
@@ -227,13 +214,9 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("api.Data.Entities.TaskAssignedToUser", b =>
+            modelBuilder.Entity("api.Data.Entities.User", b =>
                 {
-                    b.HasOne("api.Data.Entities.User", "AssignedUser")
-                        .WithMany("AssignedTasks")
-                        .HasForeignKey("AssignedUserId");
-
-                    b.HasOne("api.Data.Entities.Task", "Task")
+                    b.HasOne("api.Data.Entities.Task")
                         .WithMany("Assignees")
                         .HasForeignKey("TaskId");
                 });
