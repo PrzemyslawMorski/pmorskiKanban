@@ -1,0 +1,96 @@
+{
+  "name": "kanban-front",
+  "version": "1.0.0",
+  "description": "kanban implementation as a subject of my engineer's thesis - front end",
+  "private": true,
+  "main": "webpack.common.js",
+  "scripts": {
+    "start": "npm run dev-server",
+    "build": "npm run lint && webpack --config webpack.prod.js",
+    "dev-server": "webpack-dev-server --open --config webpack.dev.js",
+    "lint": "tslint --project tsconfig.json --format codeFrame",
+    "lint:fix": "tslint --project tsconfig.json --format codeFrame --fix",
+    "test": "jest",
+    "test:watch": "test -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrzemyslawMorski/kanban-front.git"
+  },
+  "author": "Przemysław Morski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PrzemyslawMorski/kanban-front/issues"
+  },
+  "homepage": "https://github.com/PrzemyslawMorski/kanban-front#readme",
+  "devDependencies": {
+    "@types/enzyme": "^3.1.13",
+    "@types/jest": "^23.3.1",
+    "@types/lodash": "^4.14.116",
+    "@types/react": "^16.4.7",
+    "@types/react-dom": "^16.0.6",
+    "@types/react-redux": "^6.0.6",
+    "@types/react-router": "^4.0.30",
+    "@types/react-router-dom": "^4.3.0",
+    "awesome-typescript-loader": "^5.2.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^1.0.0",
+    "enzyme": "^3.4.4",
+    "enzyme-adapter-react-16": "^1.2.0",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "jest": "^23.4.2",
+    "npm-run-all": "^4.1.3",
+    "react-logger": "^1.1.0",
+    "react-test-renderer": "^16.4.2",
+    "redux-devtools": "^3.4.1",
+    "redux-logger": "^3.0.6",
+    "style-loader": "^0.21.0",
+    "ts-jest": "^23.1.2",
+    "tslint": "^5.11.0",
+    "tslint-loader": "^3.6.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^3.0.1",
+    "utility-types": "^2.0.0",
+    "webpack": "^4.0.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.5",
+    "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "@types/prop-types": "^15.5.5",
+    "firebase": "^5.5.4",
+    "lodash": "^4.17.10",
+    "normalize.css": "^8.0.0",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.2",
+    "react-bootstrap": "^0.32.1",
+    "react-dom": "^16.4.2",
+    "react-redux": "^5.0.7",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "react-transition-group": "^2.4.0",
+    "redux": "^4.0.0",
+    "redux-observable": "^1.0.0",
+    "rxjs": "^6.2.2",
+    "typesafe-actions": "^2.0.4",
+    "url-loader": "^1.1.2",
+    "whatwg-fetch": "^2.0.4"
+  },
+  "jest": {
+    "setupFiles": [
+      "./enzyme-setup/test-shim.js",
+      "./enzyme-setup/test-setup.js"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testURL": "http://localhost/",
+    "testRegex": "(\\.spec)\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  }
+}

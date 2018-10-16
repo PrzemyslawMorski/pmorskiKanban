@@ -1,0 +1,11 @@
+#register-form .cancelbtn, #register-form .signupbtn {
+  float: left;
+  width: 10%;
+}
+
+#register-form .clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
