@@ -5,6 +5,8 @@ import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {RegisterFormErrors} from "./RegisterFormErrors";
 import "./RegisterForm.css";
+import * as firebase from "firebase";
+import UserCredential = firebase.auth.UserCredential;
 
 class RegisterFormComponent extends React.Component {
   public state = {
@@ -93,6 +95,10 @@ class RegisterFormComponent extends React.Component {
               style={{marginBottom: 15}}
             />
 
+            <div className="panel panel-default">
+              <RegisterFormErrors {...this.state.formErrors}/>
+            </div>
+
             <p>
               By creating an account you agree to our <a href="#" style={{color: "dodgerblue"}}>Terms & Privacy</a>.
             </p>
@@ -105,9 +111,7 @@ class RegisterFormComponent extends React.Component {
             </div>
           </div>
         </form>
-        <div className="panel panel-default">
-          <RegisterFormErrors {...this.state.formErrors}/>
-        </div>
+
       </div>);
   }
 
@@ -207,27 +211,50 @@ class RegisterFormComponent extends React.Component {
   }
 
   private throttledHandleSubmit() {
-    // if (this.state.nameError !== "" ||
-    //   this.state.emailError !== "" ||
-    //   this.state.passwordError !== "") {
-    //   return;
-    // }
+    if (!this.state.nameValid ||
+      !this.state.emailValid ||
+      !this.state.passwordValid ||
+      !this.state.confirmPasswordValid ||
+      !this.state.formValid) {
+      return;
+    }
 
-    // firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
-    //   .then(() => {
-    //       timeout: 5000,
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     Toaster.create({
-    //       className: "recipe-toaster",
-    //       position: Position.TOP,
-    //     }).show({
-    //       intent: Intent.DANGER,
-    //       message: error.message,
-    //       timeout: 5000,
-    //     });
-    //   });
+    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .then((credentials: UserCredential) => {
+
+        if (credentials.user !== null && credentials.credential !== null) {
+          credentials.user.sendEmailVerification()
+            .then(() => {
+              // TODO set username and photoURL in db, send confirmation email, and show info that confirmation email was sent
+              // TODO save uid
+              this.setState({registeredSuccessfully: true});
+              alert("A verification email was sent to your account.");
+            })
+            .catch(() => {
+              alert("Your account was created but something went wrong when sending you an email confirmation email." +
+                " Please contact our support staff.");
+            });
+        }
+      })
+      .catch((error) => {
+        let emailValid = this.state.emailValid;
+        let passwordValid = this.state.passwordValid;
+        const fieldValidationErrors = this.state.formErrors;
+
+        if (error.code === "auth/email-already-in-use" || error.code === "auth/invalid-email") {
+          emailValid = false;
+          fieldValidationErrors.email = error.message;
+        } else if (error.code === "auth/weak-password") {
+          passwordValid = false;
+          fieldValidationErrors.password = error.message;
+        }
+
+        this.setState({
+          emailValid,
+          formErrors: fieldValidationErrors,
+          passwordValid,
+        }, this.validateForm);
+      });
   }
 }
 

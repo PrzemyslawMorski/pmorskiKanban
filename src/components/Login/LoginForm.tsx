@@ -2,22 +2,31 @@ import * as React from "react";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import "./LoginForm.css";
+import {LoginFormErrors} from "./LoginFormErrors";
+import * as _ from "lodash";
 
 class LoginFormComponent extends React.Component {
   public state = {
     email: "",
+    emailValid: false,
+    formErrors: {email: "", password: ""},
+    formValid: false,
     loggedInSuccessfully: false,
     password: "",
+    passwordValid: false,
     rememberMe: false,
   };
 
   constructor(props: any, context: any) {
     super(props, context);
 
-    this.handleEmailChange = this.handleEmailChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handleRememberMeChange = this.handleRememberMeChange.bind(this);
+    this.handleUserInput = this.handleUserInput.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.validateField = this.validateField.bind(this);
+    this.validateForm = this.validateForm.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.throttledHandleSubmit = _.throttle(this.throttledHandleSubmit, 500);
   }
 
   public render() {
@@ -33,41 +42,46 @@ class LoginFormComponent extends React.Component {
             <p>Please fill in this form to log in.</p>
             <hr/>
 
-            <label htmlFor="uname"><b>Username</b></label>
+            <label htmlFor="email"><b>Email</b></label>
             <input
+              className={`${this.errorClass(this.state.formErrors.email)}`}
               type="text"
-              onChange={this.handleEmailChange}
-              placeholder="Enter Username"
-              name="uname"
+              onChange={this.handleUserInput}
+              placeholder="Enter Email"
+              name="email"
               required={true}
             />
 
-            <label htmlFor="psw"><b>Password</b></label>
+            <label htmlFor="password"><b>Password</b></label>
 
             <input
+              className={`${this.errorClass(this.state.formErrors.password)}`}
               type="password"
-              onChange={this.handlePasswordChange}
+              onChange={this.handleUserInput}
               placeholder="Enter Password"
-              name="psw"
+              name="password"
               required={true}
             />
 
-            <label>
-              <input
-                type="checkbox"
-                onChange={this.handleRememberMeChange}
-                checked={this.state.rememberMe}
-                name="remember"
-              />
-              Remember me
-            </label>
+            <label htmlFor="rememberMe">Remember me</label>
+            <input
+              type="checkbox"
+              onChange={this.handleUserInput}
+              checked={this.state.rememberMe}
+              name="rememberMe"
+              style={{marginBottom: 15}}
+            />
+          </div>
+
+          <div className="panel panel-default">
+            <LoginFormErrors {...this.state.formErrors}/>
           </div>
 
           <div className="clearfix">
             <Link to="/">
               <button type="button" className="cancelbtn failbtn">Cancel</button>
             </Link>
-            <button type="submit" className="loginbtn successbtn">Sign Up</button>
+            <button type="submit" disabled={!this.state.formValid} className="loginbtn successbtn">Sign Up</button>
           </div>
           <div>
             <span className="psw">
@@ -79,24 +93,76 @@ class LoginFormComponent extends React.Component {
     );
   }
 
-  private handleEmailChange(event: React.FormEvent) {
-    this.setState({email: (event.target as HTMLInputElement).value, emailError: "", credentialsError: ""});
+  private handleUserInput(event: React.FormEvent) {
+    const name = (event.target as HTMLInputElement).name;
+    const isRememberMe = (event.target as HTMLInputElement).name === "rememberMe";
+
+    const value = isRememberMe ? (event.target as HTMLInputElement).checked : (event.target as HTMLInputElement).value;
+    if (isRememberMe) {
+      this.setState({[name]: value});
+    } else {
+      this.setState({[name]: value}, () => {
+        this.validateField(name, value as string);
+      });
+    }
   }
 
-  private handlePasswordChange(event: React.FormEvent) {
-    this.setState({password: (event.target as HTMLInputElement).value, passwordError: "", credentialsError: ""});
+  private validateField(fieldName: string, value: string) {
+    const fieldValidationErrors = this.state.formErrors;
+    let emailValid = this.state.emailValid;
+    let passwordValid = this.state.passwordValid;
+
+    switch (fieldName) {
+      case "email":
+        if (value.length === 0) {
+          emailValid = false;
+          fieldValidationErrors.email = "is required";
+        } else if (value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) === null) {
+          emailValid = false;
+          fieldValidationErrors.email = "is invalid";
+        } else {
+          emailValid = true;
+          fieldValidationErrors.email = "";
+        }
+        break;
+      case "password":
+        if (value.length === 0) {
+          passwordValid = false;
+          fieldValidationErrors.password = "is required";
+        } else if (value.length < 8) {
+          passwordValid = false;
+          fieldValidationErrors.password = "is too short";
+        } else {
+          passwordValid = true;
+          fieldValidationErrors.password = "";
+        }
+        break;
+      default:
+        break;
+    }
+    this.setState({
+      emailValid,
+      formErrors: fieldValidationErrors,
+      passwordValid,
+    }, this.validateForm);
   }
 
-  private handleRememberMeChange(event: React.FormEvent) {
-    this.setState({rememberMe: (event.target as HTMLInputElement).checked});
+  private validateForm() {
+    this.setState({
+      formValid: this.state.emailValid && this.state.passwordValid,
+    });
+  }
+
+  private errorClass(error: string) {
+    return (error.length === 0 ? "" : "has-error");
   }
 
   private handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    this.login();
+    this.throttledHandleSubmit();
   }
 
-  private login() {
+  private throttledHandleSubmit() {
     // firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
     //   .then(() => {
     //     // const token: string = success.token;

@@ -10,7 +10,7 @@ input[type=text], input[type=password] {
 
 .loginbtn, .cancelbtn {
   float: left;
-  width: 30%;
+  width: 10%;
 }
 
 span.psw {
