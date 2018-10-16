@@ -3,18 +3,21 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
+import {RegisterFormErrors} from "./RegisterFormErrors";
 import "./RegisterForm.css";
 
 class RegisterFormComponent extends React.Component {
   public state = {
     confirmPassword: "",
-    confirmPasswordError: "",
+    confirmPasswordValid: false,
     email: "",
-    emailError: "",
+    emailValid: false,
+    formErrors: {name: "", email: "", password: "", confirmPassword: ""},
+    formValid: false,
     name: "",
-    nameError: "",
+    nameValid: false,
     password: "",
-    passwordError: "",
+    passwordValid: false,
     registeredSuccessfully: false,
     rememberMe: false,
   };
@@ -24,6 +27,8 @@ class RegisterFormComponent extends React.Component {
 
     this.handleUserInput = this.handleUserInput.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.validateField = this.validateField.bind(this);
+    this.validateForm = this.validateForm.bind(this);
     this.throttledHandleSubmit = _.throttle(this.throttledHandleSubmit, 500);
   }
 
@@ -41,6 +46,7 @@ class RegisterFormComponent extends React.Component {
             <hr/>
             <label htmlFor="name"><b>Username</b></label>
             <input
+              className={`${this.errorClass(this.state.formErrors.name)}`}
               type="text"
               onChange={this.handleUserInput}
               placeholder="Enter Username"
@@ -50,6 +56,7 @@ class RegisterFormComponent extends React.Component {
 
             <label htmlFor="email"><b>Email</b></label>
             <input
+              className={`${this.errorClass(this.state.formErrors.email)}`}
               type="text"
               onChange={this.handleUserInput}
               placeholder="Enter Email"
@@ -59,6 +66,7 @@ class RegisterFormComponent extends React.Component {
 
             <label htmlFor="password"><b>Password</b></label>
             <input
+              className={`${this.errorClass(this.state.formErrors.password)}`}
               type="password"
               onChange={this.handleUserInput}
               placeholder="Enter Password"
@@ -68,6 +76,7 @@ class RegisterFormComponent extends React.Component {
 
             <label><b>Repeat Password</b></label>
             <input
+              className={`${this.errorClass(this.state.formErrors.confirmPassword)}`}
               type="password"
               onChange={this.handleUserInput}
               placeholder="Repeat Password"
@@ -92,13 +101,14 @@ class RegisterFormComponent extends React.Component {
               <Link to="/">
                 <button type="button" className="cancelbtn failbtn">Cancel</button>
               </Link>
-              <button type="submit" className="signupbtn successbtn">Sign Up</button>
+              <button type="submit" disabled={!this.state.formValid} className="signupbtn successbtn">Sign Up</button>
             </div>
           </div>
         </form>
-      </div>
-    )
-      ;
+        <div className="panel panel-default">
+          <RegisterFormErrors {...this.state.formErrors}/>
+        </div>
+      </div>);
   }
 
   private handleUserInput(event: React.FormEvent) {
@@ -106,7 +116,89 @@ class RegisterFormComponent extends React.Component {
     const isRememberMe = (event.target as HTMLInputElement).name === "rememberMe";
 
     const value = isRememberMe ? (event.target as HTMLInputElement).checked : (event.target as HTMLInputElement).value;
-    this.setState({[name]: value});
+    if (isRememberMe) {
+      this.setState({[name]: value});
+    } else {
+      this.setState({[name]: value}, () => {
+        this.validateField(name, value as string);
+      });
+    }
+  }
+
+  private validateField(fieldName: string, value: string) {
+    const fieldValidationErrors = this.state.formErrors;
+    let nameValid = this.state.nameValid;
+    let emailValid = this.state.emailValid;
+    let passwordValid = this.state.passwordValid;
+    let confirmPasswordValid = this.state.confirmPasswordValid;
+
+    switch (fieldName) {
+      case "name":
+        nameValid = value.length > 0;
+        fieldValidationErrors.name = nameValid ? "" : " is required";
+        break;
+      case "email":
+        if (value.length === 0) {
+          emailValid = false;
+          fieldValidationErrors.email = "is required";
+        } else if (value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) === null) {
+          emailValid = false;
+          fieldValidationErrors.email = "is invalid";
+        } else {
+          emailValid = true;
+          fieldValidationErrors.email = "";
+        }
+        break;
+      case "password":
+        if (value.length === 0) {
+          passwordValid = false;
+          fieldValidationErrors.password = "is required";
+        } else if (value.length < 8) {
+          passwordValid = false;
+          fieldValidationErrors.password = "is too short";
+        } else {
+          passwordValid = true;
+          fieldValidationErrors.password = "";
+        }
+        break;
+      case "confirmPassword":
+        if (value.length === 0) {
+          confirmPasswordValid = false;
+          fieldValidationErrors.confirmPassword = "is required";
+        } else if (value.length < 8) {
+          confirmPasswordValid = false;
+          fieldValidationErrors.confirmPassword = "is too short";
+        } else if (value !== this.state.password) {
+          confirmPasswordValid = false;
+          fieldValidationErrors.confirmPassword = "doesn't match Password";
+        } else {
+          confirmPasswordValid = true;
+          fieldValidationErrors.confirmPassword = "";
+        }
+        break;
+      default:
+        break;
+    }
+    this.setState({
+      confirmPasswordValid,
+      emailValid,
+      formErrors: fieldValidationErrors,
+      nameValid,
+      passwordValid,
+    }, this.validateForm);
+  }
+
+  private validateForm() {
+    this.setState({
+      formValid: this.state.nameValid &&
+        this.state.emailValid &&
+        this.state.passwordValid &&
+        this.state.confirmPasswordValid,
+    });
+  }
+
+  private errorClass(error: string) {
+    return (error.length === 0 ? "" : "has-error");
   }
 
   private handleSubmit(event: React.FormEvent) {
@@ -115,10 +207,6 @@ class RegisterFormComponent extends React.Component {
   }
 
   private throttledHandleSubmit() {
-    this.register();
-  }
-
-  private register() {
     // if (this.state.nameError !== "" ||
     //   this.state.emailError !== "" ||
     //   this.state.passwordError !== "") {
