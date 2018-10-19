@@ -2,48 +2,29 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import {IUser} from "../../entities/User";
-import {initialStoreState} from "../../store/initialStoreState";
 import {IState} from "../../store/storeStateInterface";
-import "./Navbar.css";
 
 interface INavbarComponentProps {
   user: IUser;
 }
 
 class NavbarComponent extends React.Component<INavbarComponentProps, {}> {
+
   public render() {
-    const userLoggedIn = this.props.user !== initialStoreState.user;
-
-    return (<div id="navbar">
-      <ul>
-        <li>
-          <Link to="/">
-            <button>Kanban</button>
-          </Link></li>
-        <li>
-          <Link to="/">
-            <button>Home</button>
-          </Link>
-        </li>
-        <li>
-          <Link to="/about">
-            <button>About</button>
-          </Link>
-        </li>
-        <li>
-          <Link to="/login">
-            <button>Login</button>
-          </Link>
-        </li>
-        <li>
-          <Link to="/register">
-            <button>Register</button>
-          </Link>
-        </li>
-      </ul>
-
-      {userLoggedIn ? "user logged in" : null}
-    </div>);
+    return (
+      <div className="w3-bar w3-red w3-card w3-left-align w3-large">
+        <Link to="/" className="w3-bar-item w3-button w3-padding-large w3-white w3-mobile">
+          <i className="fa fa-home w3-padding-small"/>Home</Link>
+        <div className="w3-dropdown-hover">
+          <button className="w3-button w3-padding-large"><i className="fa fa-user w3-padding-small"/>Account</button>
+          <div className="w3-dropdown-content w3-bar-block w3-border">
+            <Link to="/login" className="w3-bar-item w3-button w3-padding-large">Login</Link>
+            <Link to="/register" className="w3-bar-item w3-button w3-padding-large">Register</Link>
+            <Link to="/forgot" className="w3-bar-item w3-button w3-padding-large">Forgot password</Link>
+          </div>
+        </div>
+        {"Email: " + this.props.user.email}
+      </div>);
   }
 }
 

@@ -1,24 +1,11 @@
 import * as React from "react";
 import {connect} from "react-redux";
-import {bindActionCreators, Dispatch} from "redux";
-import * as mockValueActions from "../../../actions/mockValueActions";
-import {IState} from "../../../store/storeStateInterface";
 
-interface IHomePageProps {
-  appName: string;
-  loadMockValue: () => void;
-}
-
-class HomePage extends React.Component<IHomePageProps, {}> {
-  constructor(props: IHomePageProps, context: any) {
-    super(props, context);
-    props.loadMockValue();
-  }
-
+class HomePage extends React.Component {
   public render(): JSX.Element {
     return (
-      <div>
-        <section>
+      <div className={"w3-container w3-panel"}>
+        <section className={"w3-container w3-panel"}>
           <span>Welcome to PmorskiKanban!</span><br/><br/>
           <span>This website is designed to make your small project complete without hickups.</span><br/><br/>
           <span>Using the Kanban method you can schedule your work to maximise productivity.</span><br/><br/>
@@ -38,19 +25,5 @@ class HomePage extends React.Component<IHomePageProps, {}> {
   }
 }
 
-function mapStateToProps(state: IState) {
-  return {
-    appName: state.appName,
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch) {
-  return {
-    loadMockValue: bindActionCreators(mockValueActions.loadMockValue, dispatch),
-  };
-}
-
 export const Home = connect(
-  mapStateToProps,
-  mapDispatchToProps,
 )(HomePage);

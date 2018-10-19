@@ -9,7 +9,6 @@ import {ForgotPassword} from "./ForgotPassword/ForgotPassword";
 import {Login} from "./Login/Login";
 import {Main} from "./Main/Main";
 import {Register} from "./Register/Register";
-import "./Root.css";
 
 const store = configureStore();
 
@@ -18,9 +17,8 @@ export class Root extends React.Component {
     return (
       <Provider store={store}>
         <BrowserRouter>
-          <div className="Site">
+          <div>
             <Navbar/>
-            <div className="SiteContent">
               <Switch>
                 <Route exact={true} path="/" component={Main}/>
                 <Route exact={true} path="/about" component={Main}/>
@@ -31,7 +29,6 @@ export class Root extends React.Component {
 
                 <Route path="*" component={PageNotFound}/>
               </Switch>
-            </div>
             <Footer/>
           </div>
         </BrowserRouter>

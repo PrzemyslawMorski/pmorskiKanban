@@ -1,11 +1,20 @@
+import * as _ from "lodash";
 import * as React from "react";
+import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
-import "./LoginForm.css";
-import {LoginFormErrors} from "./LoginFormErrors";
-import * as _ from "lodash";
+import {userLoggedIn} from "../../actions/userActions";
+import {IErrorResponse, ILoginRequest, ILoginResponse} from "../../dtos/auth";
+import {IUser} from "../../entities/User";
+import {loginUser} from "../../services/authService";
+import {saveToken} from "../../services/tokenService";
+import {Checkbox, InputField} from "../../shared-components/InputField";
 
-class LoginFormComponent extends React.Component {
+interface ILoginFormProps {
+  onLoggedIn: (user: IUser) => void;
+}
+
+class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
   public state = {
     email: "",
     emailValid: false,
@@ -34,63 +43,52 @@ class LoginFormComponent extends React.Component {
       return <Redirect to="/"/>;
     }
 
-    return (
-      <div>
-        <form id="login-form" onSubmit={this.handleSubmit}>
-          <div className="container">
-            <h1>Sign In</h1>
-            <p>Please fill in this form to log in.</p>
-            <hr/>
+    return (<form className={"w3-container w3-panel w3-padding-large w3-center"} onSubmit={this.handleSubmit}>
+      <div className="container">
 
-            <label htmlFor="email"><b>Email</b></label>
-            <input
-              className={`${this.errorClass(this.state.formErrors.email)}`}
-              type="text"
-              onChange={this.handleUserInput}
-              placeholder="Enter Email"
-              name="email"
-              required={true}
-            />
+        <div className={"w3-container w3-border w3-border-gray w3-margin"}>
+          <h1>Sign In</h1>
+          <p>Please fill in this form to log in.</p>
+        </div>
 
-            <label htmlFor="password"><b>Password</b></label>
+        <InputField
+          name={"email"}
+          label={"Email"}
+          onChange={this.handleUserInput}
+          error={this.state.formErrors.email}
+          required={true}
+          type={"text"}
+          placeholder={"Enter Email"}
+        />
 
-            <input
-              className={`${this.errorClass(this.state.formErrors.password)}`}
-              type="password"
-              onChange={this.handleUserInput}
-              placeholder="Enter Password"
-              name="password"
-              required={true}
-            />
+        <InputField
+          name={"password"}
+          label={"Password"}
+          onChange={this.handleUserInput}
+          error={this.state.formErrors.password}
+          required={true}
+          type={"password"}
+          placeholder={"Enter Password"}
+        />
 
-            <label htmlFor="rememberMe">Remember me</label>
-            <input
-              type="checkbox"
-              onChange={this.handleUserInput}
-              checked={this.state.rememberMe}
-              name="rememberMe"
-              style={{marginBottom: 15}}
-            />
-          </div>
-
-          <div className="panel panel-default">
-            <LoginFormErrors {...this.state.formErrors}/>
-          </div>
-
-          <div className="clearfix">
-            <Link to="/">
-              <button type="button" className="cancelbtn failbtn">Cancel</button>
-            </Link>
-            <button type="submit" disabled={!this.state.formValid} className="loginbtn successbtn">Sign Up</button>
-          </div>
-          <div>
-            <span className="psw">
-              Forgot <Link style={{textDecoration: "none"}} to="/forgot"><span>password?</span></Link>
-            </span>
-          </div>
-        </form>
+        <Checkbox name={"rememberMe"} label={"Remember me"} onChange={this.handleUserInput}/>
       </div>
-    );
+
+      <div className="w3-panel">
+        <Link to="/">
+          <button type="button" className="w3-btn w3-red">Cancel</button>
+        </Link>
+        <button type="submit" disabled={!this.state.formValid} className="w3-btn w3-green">Sign In</button>
+      </div>
+
+      <div>
+        <span className="w3-panel">
+          <Link style={{textDecoration: "none"}} to="/forgot">
+            <span className={"w3-text-blue"}>Forgot password?</span>
+          </Link>
+        </span>
+      </div>
+    </form>);
   }
 
   private handleUserInput(event: React.FormEvent) {
@@ -116,10 +114,10 @@ class LoginFormComponent extends React.Component {
       case "email":
         if (value.length === 0) {
           emailValid = false;
-          fieldValidationErrors.email = "is required";
+          fieldValidationErrors.email = "Email is required";
         } else if (value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) === null) {
           emailValid = false;
-          fieldValidationErrors.email = "is invalid";
+          fieldValidationErrors.email = "Email is invalid";
         } else {
           emailValid = true;
           fieldValidationErrors.email = "";
@@ -128,10 +126,10 @@ class LoginFormComponent extends React.Component {
       case "password":
         if (value.length === 0) {
           passwordValid = false;
-          fieldValidationErrors.password = "is required";
+          fieldValidationErrors.password = "Password is required";
         } else if (value.length < 8) {
           passwordValid = false;
-          fieldValidationErrors.password = "is too short";
+          fieldValidationErrors.password = "Password is too short";
         } else {
           passwordValid = true;
           fieldValidationErrors.password = "";
@@ -153,47 +151,61 @@ class LoginFormComponent extends React.Component {
     });
   }
 
-  private errorClass(error: string) {
-    return (error.length === 0 ? "" : "has-error");
-  }
-
   private handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     this.throttledHandleSubmit();
   }
 
   private throttledHandleSubmit() {
-    // firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-    //   .then(() => {
-    //     // const token: string = success.token;
-    //     //
-    //     // this.props.onLoggedIn(user);
-    //     // saveToken(token);
-    //
-    //     this.setState({loggedInSuccessfully: true});
-    //
-    //   }).catch(() => {    });
+    const loginRequest: ILoginRequest = {
+      email: this.state.email,
+      password: this.state.password,
+    };
+    loginUser(loginRequest).subscribe((response: ILoginResponse | IErrorResponse) => {
+      const loginResponse = response as ILoginResponse;
 
-    // response.json().then((badRequest: ILoginBadRequestResponse) => {
-    //   if (badRequest.emailError != null) {
-    //     this.setState({emailError: badRequest.emailError});
-    //   }
-    //
-    //   if (badRequest.passwordError != null) {
-    //     this.setState({passwordError: badRequest.passwordError});
-    //   }
-    //
-    //   if (badRequest.credentialsError != null) {
-    //     this.setState({credentialsError: badRequest.credentialsError});
-    //   }
-    // });
+      if (loginResponse !== null) {
+        const user: IUser = {
+          email: loginResponse.email,
+          name: loginResponse.username,
+          uid: loginResponse.uid,
+        };
+
+        this.props.onLoggedIn(user);
+        saveToken(loginResponse.accessToken);
+        this.setState({loggedInSuccessfully: true});
+      } else {
+        const errorResponse = response as IErrorResponse;
+
+        let emailValid = this.state.emailValid;
+        let passwordValid = this.state.passwordValid;
+        const fieldValidationErrors = this.state.formErrors;
+
+        if (errorResponse.errorCode === "auth/email-already-in-use" ||
+          errorResponse.errorCode === "auth/invalid-email") {
+          emailValid = false;
+          fieldValidationErrors.email = errorResponse.error;
+        } else if (errorResponse.errorCode === "auth/weak-password") {
+          passwordValid = false;
+          fieldValidationErrors.password = errorResponse.error;
+        } else {
+          alert(errorResponse.error);
+        }
+
+        this.setState({
+          emailValid,
+          formErrors: fieldValidationErrors,
+          passwordValid,
+        }, this.validateForm);
+      }
+    });
   }
 }
 
-// const mapDispatchToProps = (dispatch: any) => {
-//   return ({
-//     onLoggedIn: (user: IUser) => dispatch(userLoggedIn(user)),
-//   });
-// };
+const mapDispatchToProps = (dispatch: any) => {
+  return ({
+    onLoggedIn: (user: IUser) => dispatch(userLoggedIn(user)),
+  });
+};
 
-export const LoginForm = LoginFormComponent;
+export const LoginForm = connect(null, mapDispatchToProps)(LoginFormComponent);

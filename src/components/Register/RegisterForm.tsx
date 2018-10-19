@@ -3,10 +3,9 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
-import {RegisterFormErrors} from "./RegisterFormErrors";
-import "./RegisterForm.css";
-import * as firebase from "firebase";
-import UserCredential = firebase.auth.UserCredential;
+import {Checkbox, InputField} from "../../shared-components/InputField";
+import {registerUser} from "../../services/authService";
+import {IErrorResponse, IRegisterRequest, IRegisterResponse} from "../../dtos/auth";
 
 class RegisterFormComponent extends React.Component {
   public state = {
@@ -40,79 +39,61 @@ class RegisterFormComponent extends React.Component {
     }
 
     return (
-      <div>
-        <form id="register-form" onSubmit={this.handleSubmit}>
-          <div className="container">
-            <h1>Sign Up</h1>
-            <p>Please fill in this form to create an account.</p>
-            <hr/>
-            <label htmlFor="name"><b>Username</b></label>
-            <input
-              className={`${this.errorClass(this.state.formErrors.name)}`}
-              type="text"
-              onChange={this.handleUserInput}
-              placeholder="Enter Username"
-              name="name"
-              required={true}
-            />
+      <form className="w3-container w3-panel w3-padding-large w3-center" onSubmit={this.handleSubmit}>
+        <div className={"w3-container w3-border w3-border-gray w3-margin"}>
+          <h1>Sign Up</h1>
+          <p>Please fill in this form to create an account.</p>
+        </div>
 
-            <label htmlFor="email"><b>Email</b></label>
-            <input
-              className={`${this.errorClass(this.state.formErrors.email)}`}
-              type="text"
-              onChange={this.handleUserInput}
-              placeholder="Enter Email"
-              name="email"
-              required={true}
-            />
+        <InputField
+          label="Username"
+          error={this.state.formErrors.name}
+          onChange={this.handleUserInput}
+          required={true}
+          name={"name"}
+          type={"text"}
+          placeholder={"Enter Username"}
+        />
 
-            <label htmlFor="password"><b>Password</b></label>
-            <input
-              className={`${this.errorClass(this.state.formErrors.password)}`}
-              type="password"
-              onChange={this.handleUserInput}
-              placeholder="Enter Password"
-              name="password"
-              required={true}
-            />
+        <InputField
+          label="Email"
+          error={this.state.formErrors.email}
+          onChange={this.handleUserInput}
+          required={true}
+          name={"email"}
+          type={"text"}
+          placeholder={"Enter Email"}
+        />
 
-            <label><b>Repeat Password</b></label>
-            <input
-              className={`${this.errorClass(this.state.formErrors.confirmPassword)}`}
-              type="password"
-              onChange={this.handleUserInput}
-              placeholder="Repeat Password"
-              name="confirmPassword"
-              required={true}
-            />
+        <InputField
+          label="Password"
+          error={this.state.formErrors.password}
+          onChange={this.handleUserInput}
+          required={true}
+          name={"password"}
+          type={"password"}
+          placeholder={"Enter Password"}
+        />
 
-            <label htmlFor="rememberMe">Remember me</label>
-            <input
-              type="checkbox"
-              onChange={this.handleUserInput}
-              checked={this.state.rememberMe}
-              name="rememberMe"
-              style={{marginBottom: 15}}
-            />
+        <InputField
+          label="Repeat Password"
+          error={this.state.formErrors.confirmPassword}
+          onChange={this.handleUserInput}
+          required={true}
+          name={"confirmPassword"}
+          type={"password"}
+          placeholder={"Repeat Password"}
+        />
 
-            <div className="panel panel-default">
-              <RegisterFormErrors {...this.state.formErrors}/>
-            </div>
+        <Checkbox name={"rememberMe"} label={"Remember me"} onChange={this.handleUserInput}/>
 
-            <p>
-              By creating an account you agree to our <a href="#" style={{color: "dodgerblue"}}>Terms & Privacy</a>.
-            </p>
-
-            <div className="clearfix">
-              <Link to="/">
-                <button type="button" className="cancelbtn failbtn">Cancel</button>
-              </Link>
-              <button type="submit" disabled={!this.state.formValid} className="signupbtn successbtn">Sign Up</button>
-            </div>
-          </div>
-        </form>
-
-      </div>);
+        <div className="w3-panel">
+          <Link to="/">
+            <button type="button" className="w3-btn w3-red">Cancel</button>
+          </Link>
+          <button type="submit" disabled={!this.state.formValid} className="w3-btn w3-green">Sign Up</button>
+        </div>
+      </form>);
   }
 
   private handleUserInput(event: React.FormEvent) {
@@ -139,15 +120,15 @@ class RegisterFormComponent extends React.Component {
     switch (fieldName) {
       case "name":
         nameValid = value.length > 0;
-        fieldValidationErrors.name = nameValid ? "" : " is required";
+        fieldValidationErrors.name = nameValid ? "" : "Username is required";
         break;
       case "email":
         if (value.length === 0) {
           emailValid = false;
-          fieldValidationErrors.email = "is required";
+          fieldValidationErrors.email = "Email is required";
         } else if (value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i) === null) {
           emailValid = false;
-          fieldValidationErrors.email = "is invalid";
+          fieldValidationErrors.email = "Email is invalid";
         } else {
           emailValid = true;
           fieldValidationErrors.email = "";
@@ -156,10 +137,10 @@ class RegisterFormComponent extends React.Component {
       case "password":
         if (value.length === 0) {
           passwordValid = false;
-          fieldValidationErrors.password = "is required";
+          fieldValidationErrors.password = "Password is required";
         } else if (value.length < 8) {
           passwordValid = false;
-          fieldValidationErrors.password = "is too short";
+          fieldValidationErrors.password = "Password is too short";
         } else {
           passwordValid = true;
           fieldValidationErrors.password = "";
@@ -168,13 +149,13 @@ class RegisterFormComponent extends React.Component {
       case "confirmPassword":
         if (value.length === 0) {
           confirmPasswordValid = false;
-          fieldValidationErrors.confirmPassword = "is required";
+          fieldValidationErrors.confirmPassword = "Repeat Password is required";
         } else if (value.length < 8) {
           confirmPasswordValid = false;
-          fieldValidationErrors.confirmPassword = "is too short";
+          fieldValidationErrors.confirmPassword = "Repeat Password is too short";
         } else if (value !== this.state.password) {
           confirmPasswordValid = false;
-          fieldValidationErrors.confirmPassword = "doesn't match Password";
+          fieldValidationErrors.confirmPassword = "Repeat Password doesn't match Password";
         } else {
           confirmPasswordValid = true;
           fieldValidationErrors.confirmPassword = "";
@@ -201,10 +182,6 @@ class RegisterFormComponent extends React.Component {
     });
   }
 
-  private errorClass(error: string) {
-    return (error.length === 0 ? "" : "has-error");
-  }
-
   private handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     this.throttledHandleSubmit();
@@ -219,41 +196,39 @@ class RegisterFormComponent extends React.Component {
       return;
     }
 
-    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then((credentials: UserCredential) => {
+    const registerRequest: IRegisterRequest = {
+      email: this.state.email, name: this.state.name, password: this.state.password,
+    };
 
-        if (credentials.user !== null && credentials.credential !== null) {
-          credentials.user.sendEmailVerification()
-            .then(() => {
-              // TODO set username and photoURL in db, send confirmation email, and show info that confirmation email was sent
-              // TODO save uid
-              this.setState({registeredSuccessfully: true});
-              alert("A verification email was sent to your account.");
-            })
-            .catch(() => {
-              alert("Your account was created but something went wrong when sending you an email confirmation email." +
-                " Please contact our support staff.");
-            });
+    registerUser(registerRequest)
+      .subscribe((response: IRegisterResponse | IErrorResponse) => {
+        if (response as IRegisterResponse !== null) {
+          this.setState({registeredSuccessfully: true});
+          alert("A verification email was sent to your account.");
+        } else {
+          const errorResponse = response as IErrorResponse;
+
+          let emailValid = this.state.emailValid;
+          let passwordValid = this.state.passwordValid;
+          const fieldValidationErrors = this.state.formErrors;
+
+          if (errorResponse.errorCode === "auth/email-already-in-use" ||
+            errorResponse.errorCode === "auth/invalid-email") {
+            emailValid = false;
+            fieldValidationErrors.email = errorResponse.error;
+          } else if (errorResponse.errorCode === "auth/weak-password") {
+            passwordValid = false;
+            fieldValidationErrors.password = errorResponse.error;
+          } else {
+            alert(errorResponse.error);
+          }
+
+          this.setState({
+            emailValid,
+            formErrors: fieldValidationErrors,
+            passwordValid,
+          }, this.validateForm);
         }
-      })
-      .catch((error) => {
-        let emailValid = this.state.emailValid;
-        let passwordValid = this.state.passwordValid;
-        const fieldValidationErrors = this.state.formErrors;
-
-        if (error.code === "auth/email-already-in-use" || error.code === "auth/invalid-email") {
-          emailValid = false;
-          fieldValidationErrors.email = error.message;
-        } else if (error.code === "auth/weak-password") {
-          passwordValid = false;
-          fieldValidationErrors.password = error.message;
-        }
-
-        this.setState({
-          emailValid,
-          formErrors: fieldValidationErrors,
-          passwordValid,
-        }, this.validateForm);
       });
   }
 }
