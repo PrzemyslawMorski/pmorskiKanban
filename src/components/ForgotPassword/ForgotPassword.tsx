@@ -2,8 +2,8 @@ import * as firebase from "firebase";
 import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
-import {ForgotPasswordForm} from "./ForgotPasswordForm";
 import {IState} from "../../store/storeStateInterface";
+import {ForgotPasswordForm} from "./ForgotPasswordForm";
 
 interface IForgotPasswordProps {
   user: firebase.User | null;

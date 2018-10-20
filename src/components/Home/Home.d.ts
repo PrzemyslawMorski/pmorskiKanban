@@ -1,5 +1,4 @@
-/// <reference types="react-redux" />
 import * as React from "react";
-export declare const Home: React.ComponentClass<Pick<{}, never>, React.ComponentState> & {
-    WrappedComponent: React.ComponentType<{}>;
-};
+export declare class Home extends React.Component {
+    render(): JSX.Element;
+}
