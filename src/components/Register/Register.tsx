@@ -1,12 +1,17 @@
 import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router-dom";
-import {tokenExists} from "../../services/tokenService";
+import {IUser} from "../../entities/User";
+import {IState} from "../../store/storeStateInterface";
 import {RegisterForm} from "./RegisterForm";
 
-class RegisterPage extends React.Component {
+interface IRegisterPageProps {
+  user: IUser | null;
+}
+
+class RegisterPage extends React.Component<IRegisterPageProps, {}> {
   public render() {
-    if (tokenExists()) {
+    if (this.props.user !== null) {
       return <Redirect to="/"/>;
     }
 
@@ -18,4 +23,10 @@ class RegisterPage extends React.Component {
   }
 }
 
-export const Register = connect()(RegisterPage);
+function mapStateToProps(state: IState) {
+  return {
+    user: state.user,
+  };
+}
+
+export const Register = connect(mapStateToProps)(RegisterPage);

@@ -24,7 +24,7 @@ export const InputField: React.SFC<IInputProps> =
         name={props.name}
         required={props.required}
       />
-      <label htmlFor={props.name} className={"w3-hide" + isError ? " w3-show w3-text-red" : ""}>{props.error}</label>
+      <label htmlFor={props.name} className={`w3-hide + ${isError ? " w3-show w3-text-red" : ""}`}>{props.error}</label>
     </div>);
   };
 

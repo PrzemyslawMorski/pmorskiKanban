@@ -178,15 +178,14 @@ class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
         let passwordValid = this.state.passwordValid;
         const fieldValidationErrors = this.state.formErrors;
 
-        if (error.errorCode === "auth/email-already-in-use" ||
-          error.errorCode === "auth/invalid-email") {
+        if (error.errorCode === "auth/invalid-email" || error.errorCode === "auth/user-not-found") {
           emailValid = false;
           fieldValidationErrors.email = error.error;
-        } else if (error.errorCode === "auth/weak-password") {
+        } else if (error.errorCode === "auth/weak-password" || error.errorCode === "auth/wrong-password") {
           passwordValid = false;
           fieldValidationErrors.password = error.error;
         } else {
-          alert(error.error);
+          alert(`${error.errorCode}: ${error.error}`);
         }
 
         this.setState({

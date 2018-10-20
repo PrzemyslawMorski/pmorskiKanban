@@ -19,11 +19,26 @@ class NavbarComponent extends React.Component<INavbarComponentProps, {}> {
           <button className="w3-button w3-padding-large"><i className="fa fa-user w3-padding-small"/>Account</button>
           {this.accountDropdownContent()}
         </div>
+        {this.userProfile()}
       </div>);
   }
 
+  private userProfile() {
+    if (this.props.user !== null) {
+      return (<div>
+          <span>       Gravatar:       <img src={this.props.user.photoURL}/></span>
+          <span>       Email: {this.props.user.email}</span>
+          <span>       Name: {this.props.user.name}</span>
+          <span>       Uid: {this.props.user.uid}</span>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+
   private accountDropdownContent() {
-    if (this.props.user) {
+    if (this.props.user !== null) {
       return (<div className="w3-dropdown-content w3-bar-block w3-border">
         <Link to="/profile" className="w3-bar-item w3-button w3-padding-large">Profile</Link>
         <Link to="/logout" className="w3-bar-item w3-button w3-padding-large">Logout</Link>

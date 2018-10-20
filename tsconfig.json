@@ -6,7 +6,10 @@
     "target": "es6",
     "jsx": "react",
     "declaration": true,
-    "lib": ["es6", "dom"],
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "noFallthroughCasesInSwitch": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
@@ -15,7 +18,11 @@
     "rootDir": ".",
     "strict": true
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "functions/node_modules"
   ]
 }

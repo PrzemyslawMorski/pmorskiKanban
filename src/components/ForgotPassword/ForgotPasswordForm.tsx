@@ -113,8 +113,7 @@ class ForgotPasswordFormComponent extends React.Component {
           let emailValid = this.state.emailValid;
           const fieldValidationErrors = this.state.formErrors;
 
-          if (error.errorCode === "auth/email-already-in-use" ||
-            error.errorCode === "auth/invalid-email") {
+          if (error.errorCode === "auth/invalid-email" || error.errorCode === "auth/user-not-found") {
             emailValid = false;
             fieldValidationErrors.email = error.error;
           } else {

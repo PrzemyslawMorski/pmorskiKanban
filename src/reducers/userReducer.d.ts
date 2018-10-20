@@ -3,5 +3,5 @@ import { Reducer } from "redux";
 import { ActionType } from "typesafe-actions";
 import { IUser } from "../entities/User";
 declare type userAction = ActionType<typeof actions>;
-export declare const userReducer: Reducer<IUser, userAction>;
+export declare const userReducer: Reducer<IUser | null, userAction>;
 export {};

@@ -3,7 +3,7 @@ import * as React from "react";
 export class Footer extends React.Component {
   public render() {
     return (
-      <footer id="footer" className={"w3-container"}>
+      <footer className={"w3-container w3-mobile"}>
         <p className={"w3-quarter w3-mobile"}>Przemysław Morski</p>
         <p className={"w3-quarter w3-mobile"}>Kanban 2018</p>
         <p className={"w3-quarter w3-mobile"}>morski.przemek@gmail.com</p>
