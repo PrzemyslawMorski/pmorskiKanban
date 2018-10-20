@@ -1,7 +1,6 @@
 import * as React from "react";
-import {connect} from "react-redux";
 
-class PageNotFoundErrorPage extends React.Component {
+export class PageNotFound extends React.Component {
   public render() {
     return (
       <div>
@@ -10,5 +9,3 @@ class PageNotFoundErrorPage extends React.Component {
     );
   }
 }
-
-export const PageNotFound = connect()(PageNotFoundErrorPage);

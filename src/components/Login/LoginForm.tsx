@@ -1,20 +1,12 @@
 import * as _ from "lodash";
 import * as React from "react";
-import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
-import {userLoggedIn} from "../../actions/userActions";
-import {IErrorResponse, ILoginRequest, ILoginResponse} from "../../dtos/auth";
-import {IUser} from "../../entities/User";
+import {IErrorResponse, ILoginRequest} from "../../dtos/auth";
 import {loginUser} from "../../services/authService";
-import {saveToken} from "../../services/tokenService";
 import {Checkbox, InputField} from "../../shared-components/InputField";
 
-interface ILoginFormProps {
-  onLoggedIn: (user: IUser) => void;
-}
-
-class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
+export class LoginForm extends React.Component {
   public state = {
     email: "",
     emailValid: false,
@@ -43,7 +35,7 @@ class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
       return <Redirect to="/"/>;
     }
 
-    return (<form className={"w3-container w3-panel w3-padding-large w3-center"} onSubmit={this.handleSubmit}>
+    return (<form onSubmit={this.handleSubmit}>
       <div className="container">
 
         <div className={"w3-container w3-border w3-border-gray w3-margin"}>
@@ -161,16 +153,7 @@ class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
       email: this.state.email,
       password: this.state.password,
     };
-    loginUser(loginRequest).subscribe((response: ILoginResponse) => {
-        const user: IUser = {
-          email: response.email,
-          name: response.username,
-          photoURL: response.photoURL,
-          uid: response.uid,
-        };
-
-        this.props.onLoggedIn(user);
-        saveToken(response.accessToken);
+    loginUser(loginRequest).subscribe(() => {
         this.setState({loggedInSuccessfully: true});
       },
       (error: IErrorResponse) => {
@@ -196,11 +179,3 @@ class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
       });
   }
 }
-
-const mapDispatchToProps = (dispatch: any) => {
-  return ({
-    onLoggedIn: (user: IUser) => dispatch(userLoggedIn(user)),
-  });
-};
-
-export const LoginForm = connect(null, mapDispatchToProps)(LoginFormComponent);

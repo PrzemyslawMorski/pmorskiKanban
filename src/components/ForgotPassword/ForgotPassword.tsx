@@ -1,15 +1,15 @@
+import * as firebase from "firebase";
 import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
-import {IUser} from "../../entities/User";
-import {IState} from "../../store/storeStateInterface";
 import {ForgotPasswordForm} from "./ForgotPasswordForm";
+import {IState} from "../../store/storeStateInterface";
 
-interface IForgotPasswordPageProps {
-  user: IUser | null;
+interface IForgotPasswordProps {
+  user: firebase.User | null;
 }
 
-class ForgotPasswordPage extends React.Component<IForgotPasswordPageProps, {}> {
+export class ForgotPasswordPage extends React.Component<IForgotPasswordProps, any> {
   public render() {
     if (this.props.user !== null) {
       return <Redirect to="/"/>;
@@ -23,10 +23,8 @@ class ForgotPasswordPage extends React.Component<IForgotPasswordPageProps, {}> {
   }
 }
 
-function mapStateToProps(state: IState) {
-  return {
-    user: state.user,
-  };
-}
+const mapStateToProps = (state: IState) => ({
+  user: state.user,
+});
 
 export const ForgotPassword = connect(mapStateToProps)(ForgotPasswordPage);

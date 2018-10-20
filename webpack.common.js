@@ -21,10 +21,8 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        include: path.resolve(__dirname, 'src'),
         use: [
-          'style-loader',
-          'css-loader'
+          'style-loader', 'css-loader'
         ]
       },
       {
@@ -40,7 +38,8 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, './public')
+    path: path.resolve(__dirname, './public'),
+    publicPath: '/'
   },
   optimization: {
     removeAvailableModules: false,

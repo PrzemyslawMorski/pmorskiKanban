@@ -1,7 +1,6 @@
 import * as React from "react";
-import {connect} from "react-redux";
 
-class HomePage extends React.Component {
+export class Home extends React.Component {
   public render(): JSX.Element {
     return (
       <div className={"w3-container w3-panel"}>
@@ -24,6 +23,3 @@ class HomePage extends React.Component {
     );
   }
 }
-
-export const Home = connect(
-)(HomePage);

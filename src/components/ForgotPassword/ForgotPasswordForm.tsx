@@ -1,13 +1,12 @@
 import * as _ from "lodash";
 import * as React from "react";
-import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {IErrorResponse} from "../../dtos/auth";
 import {forgotPassword} from "../../services/authService";
 import {InputField} from "../../shared-components/InputField";
 
-class ForgotPasswordFormComponent extends React.Component {
+export class ForgotPasswordForm extends React.Component {
   public state = {
     email: "",
     emailValid: false,
@@ -131,5 +130,3 @@ class ForgotPasswordFormComponent extends React.Component {
         });
   }
 }
-
-export const ForgotPasswordForm = connect()(ForgotPasswordFormComponent);

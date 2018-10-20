@@ -2,15 +2,12 @@ import * as firebase from "firebase";
 import * as React from "react";
 import {Provider} from "react-redux";
 import {BrowserRouter, Route, Switch} from "react-router-dom";
-import {userLoggedIn, userLoggedOut} from "../actions/userActions";
-import {IUser} from "../entities/User";
-import {removeToken} from "../services/tokenService";
+import {userSignedIn, userSignedOut} from "../actions/userActions";
+import {removeToken, saveToken} from "../services/tokenService";
 import {Footer} from "../shared-components/Footer/Footer";
 import {Logout} from "../shared-components/Logout/Logout";
 import {Navbar} from "../shared-components/Navbar/Navbar";
 import {configureStore} from "../store/configureStore";
-import {AuthAction} from "./Auth/AuthAction";
-import {AuthHandler} from "./Auth/AuthHandler";
 import {PageNotFound} from "./ErrorPages/PageNotFound/PageNotFound";
 import {ForgotPassword} from "./ForgotPassword/ForgotPassword";
 import {Home} from "./Home/Home";
@@ -30,17 +27,14 @@ const config = {
 
 firebase.initializeApp(config);
 
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged((user: firebase.User | null) => {
   if (user !== null) {
-    const kanbanUser: IUser = {
-      email: user.email!,
-      name: user.displayName!,
-      photoURL: user.photoURL!,
-      uid: user.uid,
-    };
-    store.dispatch(userLoggedIn(kanbanUser));
+    user.getIdToken().then((token) => {
+      store.dispatch(userSignedIn(user));
+      saveToken(token);
+    });
   } else {
-    store.dispatch(userLoggedOut());
+    store.dispatch(userSignedOut());
     removeToken();
   }
 });
@@ -53,9 +47,6 @@ export class Root extends React.Component {
           <div>
             <Navbar/>
             <Switch>
-              <Route path="/authAction" component={AuthAction}/>
-              <Route path="/authHandler" component={AuthHandler}/>
-
               <Route path="/login" component={Login}/>
               <Route path="/logout" component={Logout}/>
               <Route path="/register" component={Register}/>
