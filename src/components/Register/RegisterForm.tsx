@@ -3,9 +3,9 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
-import {Checkbox, InputField} from "../../shared-components/InputField";
+import {IErrorResponse, IRegisterRequest} from "../../dtos/auth";
 import {registerUser} from "../../services/authService";
-import {IErrorResponse, IRegisterRequest, IRegisterResponse} from "../../dtos/auth";
+import {Checkbox, InputField} from "../../shared-components/InputField";
 
 class RegisterFormComponent extends React.Component {
   public state = {
@@ -201,26 +201,22 @@ class RegisterFormComponent extends React.Component {
     };
 
     registerUser(registerRequest)
-      .subscribe((response: IRegisterResponse | IErrorResponse) => {
-        if (response as IRegisterResponse !== null) {
-          this.setState({registeredSuccessfully: true});
-          alert("A verification email was sent to your account.");
-        } else {
-          const errorResponse = response as IErrorResponse;
-
+      .subscribe(
+        undefined,
+        (error: IErrorResponse) => {
           let emailValid = this.state.emailValid;
           let passwordValid = this.state.passwordValid;
           const fieldValidationErrors = this.state.formErrors;
 
-          if (errorResponse.errorCode === "auth/email-already-in-use" ||
-            errorResponse.errorCode === "auth/invalid-email") {
+          if (error.errorCode === "auth/email-already-in-use" ||
+            error.errorCode === "auth/invalid-email") {
             emailValid = false;
-            fieldValidationErrors.email = errorResponse.error;
-          } else if (errorResponse.errorCode === "auth/weak-password") {
+            fieldValidationErrors.email = error.error;
+          } else if (error.errorCode === "auth/weak-password") {
             passwordValid = false;
-            fieldValidationErrors.password = errorResponse.error;
+            fieldValidationErrors.password = error.error;
           } else {
-            alert(errorResponse.error);
+            alert(error.error);
           }
 
           this.setState({
@@ -228,8 +224,11 @@ class RegisterFormComponent extends React.Component {
             formErrors: fieldValidationErrors,
             passwordValid,
           }, this.validateForm);
-        }
-      });
+        },
+        () => {
+          this.setState({registeredSuccessfully: true});
+          alert("A verification email was sent to your email address.");
+        });
   }
 }
 

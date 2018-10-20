@@ -4,3 +4,6 @@ import * as actionTypes from "./constants";
 
 export const userLoggedIn =
   (value: IUser) => action(actionTypes.USER_LOGGED_IN, value);
+
+export const userLoggedOut =
+  () => action(actionTypes.USER_LOGGED_OUT);

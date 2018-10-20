@@ -25,4 +25,5 @@ export interface ILoginResponse {
   username: string;
   accessToken: string;
   email: string;
+  photoURL: string;
 }

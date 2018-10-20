@@ -161,35 +161,32 @@ class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
       email: this.state.email,
       password: this.state.password,
     };
-    loginUser(loginRequest).subscribe((response: ILoginResponse | IErrorResponse) => {
-      const loginResponse = response as ILoginResponse;
-
-      if (loginResponse !== null) {
+    loginUser(loginRequest).subscribe((response: ILoginResponse) => {
         const user: IUser = {
-          email: loginResponse.email,
-          name: loginResponse.username,
-          uid: loginResponse.uid,
+          email: response.email,
+          name: response.username,
+          photoURL: response.photoURL,
+          uid: response.uid,
         };
 
         this.props.onLoggedIn(user);
-        saveToken(loginResponse.accessToken);
+        saveToken(response.accessToken);
         this.setState({loggedInSuccessfully: true});
-      } else {
-        const errorResponse = response as IErrorResponse;
-
+      },
+      (error: IErrorResponse) => {
         let emailValid = this.state.emailValid;
         let passwordValid = this.state.passwordValid;
         const fieldValidationErrors = this.state.formErrors;
 
-        if (errorResponse.errorCode === "auth/email-already-in-use" ||
-          errorResponse.errorCode === "auth/invalid-email") {
+        if (error.errorCode === "auth/email-already-in-use" ||
+          error.errorCode === "auth/invalid-email") {
           emailValid = false;
-          fieldValidationErrors.email = errorResponse.error;
-        } else if (errorResponse.errorCode === "auth/weak-password") {
+          fieldValidationErrors.email = error.error;
+        } else if (error.errorCode === "auth/weak-password") {
           passwordValid = false;
-          fieldValidationErrors.password = errorResponse.error;
+          fieldValidationErrors.password = error.error;
         } else {
-          alert(errorResponse.error);
+          alert(error.error);
         }
 
         this.setState({
@@ -197,8 +194,7 @@ class LoginFormComponent extends React.Component<ILoginFormProps, {}> {
           formErrors: fieldValidationErrors,
           passwordValid,
         }, this.validateForm);
-      }
-    });
+      });
   }
 }
 
