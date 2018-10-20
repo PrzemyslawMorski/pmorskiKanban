@@ -3,6 +3,7 @@ import * as React from "react";
 import {Provider} from "react-redux";
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import {userSignedIn, userSignedOut} from "../actions/userActions";
+import {setupFirebase} from "../firebase";
 import {removeToken, saveToken} from "../services/tokenService";
 import {Footer} from "../shared-components/Footer/Footer";
 import {Logout} from "../shared-components/Logout/Logout";
@@ -16,16 +17,7 @@ import {Register} from "./Register/Register";
 
 const store = configureStore();
 
-const config = {
-  apiKey: "AIzaSyDaUHVi_rFdTLYH3GTgRKEAGpJkcT2IMOY",
-  authDomain: "pmorskikanban.firebaseapp.com",
-  databaseURL: "https://pmorskikanban.firebaseio.com",
-  messagingSenderId: "81914965876",
-  projectId: "pmorskikanban",
-  storageBucket: "pmorskikanban.appspot.com",
-};
-
-firebase.initializeApp(config);
+setupFirebase();
 
 firebase.auth().onAuthStateChanged((user: firebase.User | null) => {
   if (user !== null) {
