@@ -26,7 +26,6 @@ export class LoginPage extends React.Component<ILoginProps, any> {
       signInFlow: "popup",
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        firebase.auth.FacebookAuthProvider.PROVIDER_ID,
         firebase.auth.GithubAuthProvider.PROVIDER_ID,
       ],
 

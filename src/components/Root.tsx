@@ -4,6 +4,7 @@ import {Provider} from "react-redux";
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import {userSignedIn, userSignedOut} from "../actions/userActions";
 import {setupFirebase} from "../firebase";
+// ^^ this is not in the repo, create a file with firebase config and a firebase.initApp call
 import {removeToken, saveToken} from "../services/tokenService";
 import {Footer} from "../shared-components/Footer/Footer";
 import {Logout} from "../shared-components/Logout/Logout";
