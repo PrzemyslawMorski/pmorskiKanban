@@ -1,12 +1,12 @@
-import * as firebase from "firebase";
 import * as React from "react";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
+import {IUser} from "../../entities/IUser";
 import {IState} from "../../store/storeStateInterface";
 import {NavbarUser} from "./NavbarUser";
 
 interface INavbarProps {
-  user: firebase.User | null;
+  user: IUser | null;
 }
 
 class NavbarComponent extends React.Component<INavbarProps, any> {
@@ -25,9 +25,9 @@ class NavbarComponent extends React.Component<INavbarProps, any> {
   private accountDropdown(): JSX.Element {
     if (this.props.user !== null) {
       return (<div className="w3-dropdown-hover">
-        <Link to="/profile" className="w3-button w3-padding-large w3-red w3-hover-white">
+        <a className="w3-button w3-padding-large w3-red w3-hover-white">
           <NavbarUser userName={this.props.user.displayName} photoUrl={this.props.user.photoURL}/>
-        </Link>
+        </a>
         <div className="w3-dropdown-content w3-bar-block w3-border w3-red">
           <Link to="/profile" className="w3-bar-item w3-button w3-red w3-hover-white">Profile</Link>
           <Link to="/logout" className="w3-bar-item w3-button w3-red w3-hover-white">Logout</Link>

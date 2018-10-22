@@ -1,6 +1,6 @@
-import * as firebase from "firebase";
+import {IUser} from "../entities/IUser";
 
 export interface IState {
   readonly appName: string;
-  readonly user: firebase.User | null;
+  readonly user: IUser | null;
 }

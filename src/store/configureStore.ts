@@ -8,8 +8,6 @@ const epicMiddleware = createEpicMiddleware();
 
 export function configureStore(): Store {
     const store = createStore(rootReducer, initialStoreState, applyMiddleware(epicMiddleware));
-
     epicMiddleware.run(rootEpic);
-
     return store;
 }

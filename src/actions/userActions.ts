@@ -1,6 +1,6 @@
-import * as firebase from "firebase";
 import {action} from "typesafe-actions";
+import {IUser} from "../entities/IUser";
 import * as actionTypes from "./constants";
 
-export const userSignedIn = (user: firebase.User) => action(actionTypes.USER_SIGNED_IN, user);
-export const userSignedOut = () => action(actionTypes.USER_SIGNED_OUT);
+export const userData = (user: IUser | null) => action(actionTypes.USER_DATA, user);
+export const newUsername = (username: string) => action(actionTypes.NEW_USER_NAME, username);
