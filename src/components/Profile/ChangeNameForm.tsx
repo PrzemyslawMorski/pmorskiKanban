@@ -1,15 +1,16 @@
 import * as _ from "lodash";
 import * as React from "react";
 import {connect} from "react-redux";
-import {Dispatch} from "redux";
 import {newUsername} from "../../actions/userActions";
 import {IUser} from "../../entities/IUser";
 import {changeUserName} from "../../services/authService";
 import {InputField} from "../../shared-components/InputField";
+import {Dispatch} from "redux";
 
 interface IChangeNameProps {
   user: IUser | null;
   onNewName: (username: string) => void;
+  isExternalProviderAccount: boolean;
 }
 
 export class ChangeNameFormComponent extends React.Component<IChangeNameProps> {
@@ -34,19 +35,25 @@ export class ChangeNameFormComponent extends React.Component<IChangeNameProps> {
         <h3>Change name</h3>
         <form onSubmit={this.handleSubmit}>
           <InputField
-            name={"email"}
-            label={"Email"}
+            name={"name"}
+            label={"Name"}
             onChange={this.handleUserInput}
             error={this.state.nameError}
             required={true}
-            disabled={true}
+            disabled={this.props.isExternalProviderAccount}
             type={"text"}
             value={this.state.name}
             placeholder={"Enter Name"}
           />
 
           <div className="w3-panel">
-            <button type="submit" disabled={!this.state.nameValid} className="w3-btn w3-green">Change Name</button>
+            <button
+              type="submit"
+              disabled={!this.state.nameValid || this.props.isExternalProviderAccount}
+              className="w3-btn w3-green"
+            >
+              Change Name
+            </button>
           </div>
         </form>
       </div>
@@ -108,14 +115,13 @@ export class ChangeNameFormComponent extends React.Component<IChangeNameProps> {
         });
       }, () => {
         this.props.onNewName(this.state.name);
+        alert("Your name was successfully changed.");
       });
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch) {
-  return {
-    onNewName: (username: string) => dispatch(newUsername(username)),
-  };
-}
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  onNewName: (username: string) => dispatch(newUsername(username)),
+});
 
-export const ChangeNameForm = connect(mapDispatchToProps)(ChangeNameFormComponent);
+export const ChangeNameForm = connect(null, mapDispatchToProps)(ChangeNameFormComponent);

@@ -1,3 +1,4 @@
+import * as firebase from "firebase";
 import * as _ from "lodash";
 import * as React from "react";
 import {connect} from "react-redux";
@@ -6,9 +7,11 @@ import {newUsername} from "../../actions/userActions";
 import {IUser} from "../../entities/IUser";
 import {InputField} from "../../shared-components/InputField";
 import {IState} from "../../store/storeStateInterface";
+import EmailAuthProvider = firebase.auth.EmailAuthProvider;
 
 interface IChangePasswordProps {
   user: IUser | null;
+  isExternalProviderAccount: boolean;
 }
 
 export class ChangePasswordFormComponent extends React.Component<IChangePasswordProps> {
@@ -34,8 +37,6 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
   }
 
   public render() {
-    const isExternalProviderAccount = false;
-
     return (
       <div className={"w3-container w3-panel w3-padding-large w3-center"}>
         <h3>Change password</h3>
@@ -46,7 +47,7 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
             onChange={this.handleUserInput}
             error={this.state.formErrors.currentPassword}
             required={true}
-            disabled={isExternalProviderAccount}
+            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             value={this.state.currentPassword}
             placeholder={"Enter current password"}
@@ -58,7 +59,7 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
             onChange={this.handleUserInput}
             error={this.state.formErrors.newPassword}
             required={true}
-            disabled={isExternalProviderAccount}
+            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             value={this.state.newPassword}
             placeholder={"Enter new password"}
@@ -70,14 +71,20 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
             onChange={this.handleUserInput}
             error={this.state.formErrors.repeatNewPassword}
             required={true}
-            disabled={isExternalProviderAccount}
+            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             value={this.state.repeatNewPassword}
             placeholder={"Repeat new password"}
           />
 
           <div className="w3-panel">
-            <button type="submit" disabled={!this.state.formValid} className="w3-btn w3-green">Change Password</button>
+            <button
+              type="submit"
+              disabled={!this.state.formValid || this.props.isExternalProviderAccount}
+              className="w3-btn w3-green"
+            >
+              Change Password
+            </button>
           </div>
         </form>
       </div>
@@ -170,65 +177,49 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
       return;
     }
 
-    // firebase.auth().currentUser!.updatePassword(this.state.newPassword)
-    //   .then(() => {
-    //
-    //   })
-    //   .catch((error: firebase.auth.Error) => {
-    //     let newPasswordValid = this.state.newPasswordValid;
-    //     const fieldValidationErrors = this.state.formErrors;
-    //
-    //     if (error.code === "auth/email-already-in-use" ||
-    //       error.code === "auth/invalid-email") {
-    //       emailValid = false;
-    //       fieldValidationErrors.email = error.message;
-    //     } else if (error.errorCode === "auth/weak-password") {
-    //       passwordValid = false;
-    //       fieldValidationErrors.password = error.message;
-    //     } else {
-    //       alert(error.message);
-    //     }
-    //
-    //     this.setState({
-    //       emailValid,
-    //       formErrors: fieldValidationErrors,
-    //       passwordValid,
-    //     }, this.validateForm);
-    //   );
+    firebase.auth().currentUser!
+      .reauthenticateAndRetrieveDataWithCredential(
+        EmailAuthProvider.credential(this.props.user!.email, this.state.currentPassword),
+      )
+      .then(() => {
+        firebase.auth().currentUser!.updatePassword(this.state.newPassword)
+          .then(() => {
+            alert("Your password was successfully changed.");
+          })
+          .catch((error: firebase.auth.Error) => {
+            let newPassword = this.state.newPasswordValid;
+            const fieldValidationErrors = this.state.formErrors;
 
-    // const registerRequest: IChangePasswordRequest = {
-    //   email: this.props.user!.email,
-    //   currentPasswordname: this.state.name, password: this.state.password,
-    // };
-    //
-    // registerUser(registerRequest)
-    //   .subscribe(
-    //     undefined,
-    //     (error: IErrorResponse) => {
-    //       let emailValid = this.state.emailValid;
-    //       let passwordValid = this.state.passwordValid;
-    //       const fieldValidationErrors = this.state.formErrors;
-    //
-    //       if (error.errorCode === "auth/email-already-in-use" ||
-    //         error.errorCode === "auth/invalid-email") {
-    //         emailValid = false;
-    //         fieldValidationErrors.email = error.error;
-    //       } else if (error.errorCode === "auth/weak-password") {
-    //         passwordValid = false;
-    //         fieldValidationErrors.password = error.error;
-    //       } else {
-    //         alert(error.error);
-    //       }
-    //
-    //       this.setState({
-    //         emailValid,
-    //         formErrors: fieldValidationErrors,
-    //         passwordValid,
-    //       }, this.validateForm);
-    //     },
-    //     () => {
-    //       alert("A verification email has been sent to your email address.");
-    //     });
+            if (error.message === "auth/weak-password" || error.code === "auth/wrong-password") {
+              alert(`${error.code}: ${error.message}`);
+            } else if (error.message === "auth/weak-password" || error.code === "auth/wrong-password") {
+              newPassword = false;
+              fieldValidationErrors.newPassword = error.message;
+            }
+
+            this.setState({
+              formErrors: fieldValidationErrors,
+              newPassword,
+            }, this.validateForm);
+
+            alert(error.message);
+          });
+      }).catch((error) => {
+      let currentPasswordValid = this.state.currentPasswordValid;
+      const fieldValidationErrors = this.state.formErrors;
+
+      if (error.code === "auth/invalid-email" || error.code === "auth/user-not-found") {
+        alert(`${error.code}: ${error.message}`);
+      } else if (error.message === "auth/weak-password" || error.code === "auth/wrong-password") {
+        currentPasswordValid = false;
+        fieldValidationErrors.currentPassword = error.message;
+      }
+
+      this.setState({
+        currentPasswordValid,
+        formErrors: fieldValidationErrors,
+      }, this.validateForm);
+    });
   }
 }
 
