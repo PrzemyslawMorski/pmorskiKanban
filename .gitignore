@@ -14,5 +14,6 @@
 **/*.swo
 
 **/firebase.ts
+**/firebase.d.ts
 **/firebase.js
 
