@@ -1,8 +1,8 @@
 /// <reference types="react-redux" />
-import * as firebase from "firebase";
 import * as React from "react";
+import { IUser } from "../../entities/IUser";
 interface INavbarProps {
-    user: firebase.User | null;
+    user: IUser | null;
 }
 export declare const Navbar: React.ComponentClass<Pick<INavbarProps, never>, React.ComponentState> & {
     WrappedComponent: React.ComponentType<INavbarProps>;

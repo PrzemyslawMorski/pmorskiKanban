@@ -7,7 +7,6 @@ interface INavbarUserProps {
 }
 
 export const NavbarUser: React.SFC<INavbarUserProps> = (props) => {
-  debugger;
   if (props.photoUrl === null || props.photoUrl === "" || props.userName === null || props.userName === "") {
     return (<div>
         <span>Account</span>

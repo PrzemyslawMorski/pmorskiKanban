@@ -1,8 +1,8 @@
 /// <reference types="react-redux" />
-import * as firebase from "firebase";
 import * as React from "react";
+import { IUser } from "../../entities/IUser";
 interface IForgotPasswordProps {
-    user: firebase.User | null;
+    user: IUser | null;
 }
 export declare class ForgotPasswordPage extends React.Component<IForgotPasswordProps, any> {
     render(): JSX.Element;

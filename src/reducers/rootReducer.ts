@@ -1,8 +1,8 @@
 import {combineReducers} from "redux";
-import {mockValueReducer} from "./loadMockValueReducer";
+import {boardsReducer} from "./boardsReducer";
 import {userReducer} from "./userReducer";
 
 export const rootReducer = combineReducers({
-  appName: mockValueReducer,
+  boards: boardsReducer,
   user: userReducer,
 });

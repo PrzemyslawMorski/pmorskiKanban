@@ -1,8 +1,8 @@
 /// <reference types="react-redux" />
-import * as firebase from "firebase";
 import * as React from "react";
+import { IUser } from "../../entities/IUser";
 interface IRegisterProps {
-    user: firebase.User | null;
+    user: IUser | null;
 }
 export declare class RegisterPage extends React.Component<IRegisterProps, any> {
     render(): JSX.Element;

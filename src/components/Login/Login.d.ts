@@ -1,8 +1,8 @@
 /// <reference types="react-redux" />
-import * as firebase from "firebase";
 import * as React from "react";
+import { IUser } from "../../entities/IUser";
 interface ILoginProps {
-    user: firebase.User | null;
+    user: IUser | null;
 }
 export declare class LoginPage extends React.Component<ILoginProps, any> {
     state: {

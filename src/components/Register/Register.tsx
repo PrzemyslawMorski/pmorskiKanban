@@ -1,9 +1,9 @@
 import * as React from "react";
 import {connect} from "react-redux";
+import {Redirect} from "react-router";
 import {IUser} from "../../entities/IUser";
 import {IState} from "../../store/storeStateInterface";
 import {RegisterForm} from "./RegisterForm";
-import {Redirect} from "react-router";
 
 interface IRegisterProps {
   user: IUser | null;

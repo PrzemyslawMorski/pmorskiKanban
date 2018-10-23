@@ -8,10 +8,8 @@ export declare class LoginForm extends React.Component {
             password: string;
         };
         formValid: boolean;
-        loggedInSuccessfully: boolean;
         password: string;
         passwordValid: boolean;
-        rememberMe: boolean;
     };
     constructor(props: any, context: any);
     render(): JSX.Element;

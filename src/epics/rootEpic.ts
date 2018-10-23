@@ -1,4 +1,6 @@
 import {combineEpics} from "redux-observable";
-import {mockValueEpic} from "./mockValueEpic";
+import {boardMiniaturesEpic} from "./boardMiniaturesEpic";
 
-export const rootEpic = combineEpics(mockValueEpic);
+export const rootEpic = combineEpics(
+  boardMiniaturesEpic,
+);

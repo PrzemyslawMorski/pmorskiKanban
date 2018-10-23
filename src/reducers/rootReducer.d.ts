@@ -1,4 +1,4 @@
 export declare const rootReducer: import("redux").Reducer<{
-    appName: string;
-    user: import("firebase").User | null;
+    boards: import("../entities/IBoard").IBoardMiniature[];
+    user: import("../entities/IUser").IUser | null;
 }, import("redux").AnyAction>;
