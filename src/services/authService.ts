@@ -2,9 +2,10 @@ import * as firebase from "firebase";
 import {Observable, Observer} from "rxjs";
 import {IErrorResponse, ILoginRequest, IRegisterRequest} from "../dtos/auth";
 import HttpsCallableResult = firebase.functions.HttpsCallableResult;
+import {IUser} from "../entities/IUser";
 
-export const registerUser = (request: IRegisterRequest): Observable<void> => {
-  return Observable.create((observer: Observer<void>) => {
+export const registerUser = (request: IRegisterRequest): Observable<IUser> => {
+  return Observable.create((observer: Observer<IUser>) => {
     firebase.auth().createUserWithEmailAndPassword(request.email, request.password)
       .then((response: firebase.auth.UserCredential) => {
         response!.user!.sendEmailVerification()
@@ -17,6 +18,13 @@ export const registerUser = (request: IRegisterRequest): Observable<void> => {
                   photoURL: gravatarUrl.data as string,
                 })
                   .then(() => {
+                    const user: IUser = {
+                      displayName: request.name,
+                      email: request.email,
+                      photoURL: gravatarUrl.data as string,
+                      uid: response!.user!.uid,
+                    };
+                    observer.next(user);
                     observer.complete();
                   })
                   .catch((error: firebase.auth.Error) => {
@@ -26,6 +34,7 @@ export const registerUser = (request: IRegisterRequest): Observable<void> => {
                       errorCode: error.code,
                     };
                     observer.error(errorResponse);
+                    observer.complete();
                   });
               });
           })
@@ -37,6 +46,7 @@ export const registerUser = (request: IRegisterRequest): Observable<void> => {
               errorCode: error.code,
             };
             observer.error(errorResponse);
+            observer.complete();
           });
       })
       .catch((error: firebase.auth.Error) => {
@@ -45,6 +55,7 @@ export const registerUser = (request: IRegisterRequest): Observable<void> => {
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
@@ -64,6 +75,7 @@ export const loginUser = (request: ILoginRequest): Observable<void> => {
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
@@ -78,6 +90,7 @@ export const forgotPassword = (email: string): Observable<void> => {
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
@@ -94,6 +107,7 @@ export const logoutUser = (): Observable<void> => {
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
@@ -115,6 +129,7 @@ export const changeUserName = (newName: string): Observable<void> => {
             errorCode: error.code,
           };
           observer.error(errorResponse);
+          observer.complete();
         });
     } else {
       alert("Please sign in to change your name.");

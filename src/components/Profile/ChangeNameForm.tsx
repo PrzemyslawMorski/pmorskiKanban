@@ -1,11 +1,11 @@
 import * as _ from "lodash";
 import * as React from "react";
 import {connect} from "react-redux";
+import {Dispatch} from "redux";
 import {newUsername} from "../../actions/userActions";
 import {IUser} from "../../entities/IUser";
 import {changeUserName} from "../../services/authService";
 import {InputField} from "../../shared-components/InputField";
-import {Dispatch} from "redux";
 
 interface IChangeNameProps {
   user: IUser | null;

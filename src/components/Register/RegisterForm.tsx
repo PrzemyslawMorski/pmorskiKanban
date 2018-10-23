@@ -1,7 +1,9 @@
 import * as _ from "lodash";
 import * as React from "react";
 import {connect} from "react-redux";
-import {Link, Redirect} from "react-router-dom";
+import {Link} from "react-router-dom";
+import {Dispatch} from "redux";
+import {userData} from "../../actions/userActions";
 import {IErrorResponse, IRegisterRequest} from "../../dtos/auth";
 import {IUser} from "../../entities/IUser";
 import {registerUser} from "../../services/authService";
@@ -10,6 +12,7 @@ import {IState} from "../../store/storeStateInterface";
 
 interface IRegisterFormProps {
   user: IUser | null;
+  registered: (user: IUser) => void;
 }
 
 class RegisterFormComponent extends React.Component<IRegisterFormProps, any> {
@@ -37,10 +40,6 @@ class RegisterFormComponent extends React.Component<IRegisterFormProps, any> {
   }
 
   public render() {
-    if (this.props.user !== null) {
-      return <Redirect to="/"/>;
-    }
-
     return (
       <form className="w3-container w3-panel w3-padding-large w3-center" onSubmit={this.handleSubmit}>
         <div className={"w3-container w3-border w3-border-gray w3-margin"}>
@@ -199,7 +198,10 @@ class RegisterFormComponent extends React.Component<IRegisterFormProps, any> {
 
     registerUser(registerRequest)
       .subscribe(
-        undefined,
+        (user: IUser) => {
+          this.props.registered(user);
+          alert("A verification email has been sent to your email address.");
+        },
         (error: IErrorResponse) => {
           let emailValid = this.state.emailValid;
           let passwordValid = this.state.passwordValid;
@@ -221,9 +223,6 @@ class RegisterFormComponent extends React.Component<IRegisterFormProps, any> {
             formErrors: fieldValidationErrors,
             passwordValid,
           }, this.validateForm);
-        },
-        () => {
-          alert("A verification email has been sent to your email address.");
         });
   }
 }
@@ -232,4 +231,8 @@ const mapStateToProps = (state: IState) => ({
   user: state.user,
 });
 
-export const RegisterForm = connect(mapStateToProps)(RegisterFormComponent);
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  registered: (user: IUser) => dispatch(userData(user)),
+});
+
+export const RegisterForm = connect(mapStateToProps, mapDispatchToProps)(RegisterFormComponent);

@@ -14,6 +14,7 @@ export class DeleteAccountComponent extends React.Component<IDeleteAccountProps>
     currentPasswordError: "",
     deletePhrase: "",
     deletePhraseError: "",
+    formValid: false,
   };
 
   constructor(props: any, context: any) {
@@ -53,7 +54,7 @@ export class DeleteAccountComponent extends React.Component<IDeleteAccountProps>
           <div className="w3-panel">
             <button
               type="submit"
-              disabled={this.state.deletePhraseError !== "" || this.state.currentPasswordError !== ""}
+              disabled={!this.state.formValid}
               className="w3-btn w3-red"
             >
               Delete account
@@ -95,6 +96,13 @@ export class DeleteAccountComponent extends React.Component<IDeleteAccountProps>
     this.setState({
       currentPasswordError,
       deletePhraseError,
+    }, this.validateForm);
+  }
+
+  private validateForm() {
+    this.setState({
+      formValid: this.state.currentPasswordError === "" &&
+        this.state.deletePhraseError === "",
     });
   }
 
