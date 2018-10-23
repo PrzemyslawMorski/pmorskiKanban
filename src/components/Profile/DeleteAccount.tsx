@@ -5,7 +5,6 @@ import * as React from "react";
 import {InputField} from "../../shared-components/InputField";
 
 interface IDeleteAccountProps {
-  isExternalProviderAccount: boolean;
   email: string;
 }
 
@@ -37,7 +36,6 @@ export class DeleteAccountComponent extends React.Component<IDeleteAccountProps>
             onChange={this.handleUserInput}
             error={this.state.currentPasswordError}
             required={true}
-            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             placeholder={"Enter current password"}
           />
@@ -48,7 +46,6 @@ export class DeleteAccountComponent extends React.Component<IDeleteAccountProps>
             onChange={this.handleUserInput}
             error={this.state.deletePhraseError}
             required={true}
-            disabled={this.props.isExternalProviderAccount}
             type={"text"}
             placeholder={"Enter 'delete'"}
           />
@@ -56,7 +53,7 @@ export class DeleteAccountComponent extends React.Component<IDeleteAccountProps>
           <div className="w3-panel">
             <button
               type="submit"
-              disabled={this.state.deletePhraseError !== ""}
+              disabled={this.state.deletePhraseError !== "" || this.state.currentPasswordError !== ""}
               className="w3-btn w3-red"
             >
               Delete account

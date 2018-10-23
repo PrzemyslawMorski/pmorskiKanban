@@ -27,13 +27,13 @@ export class ProfilePage extends React.Component<IProfileProps, any> {
 
         <div>
           <div className={"w3-third w3-mobile"}>
-            <ChangeNameForm user={this.props.user} isExternalProviderAccount={false}/>
+            <ChangeNameForm user={this.props.user}/>
           </div>
           <div className={"w3-third w3-mobile"}>
-            <ChangePasswordForm isExternalProviderAccount={false}/>
+            <ChangePasswordForm/>
           </div>
           <div className={"w3-third w3-mobile"}>
-            <DeleteAccountComponent email={this.props.user.email} isExternalProviderAccount={false}/>
+            <DeleteAccountComponent email={this.props.user.email}/>
           </div>
         </div>
       </div>

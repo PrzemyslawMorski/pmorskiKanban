@@ -10,7 +10,6 @@ import {Dispatch} from "redux";
 interface IChangeNameProps {
   user: IUser | null;
   onNewName: (username: string) => void;
-  isExternalProviderAccount: boolean;
 }
 
 export class ChangeNameFormComponent extends React.Component<IChangeNameProps> {
@@ -40,7 +39,6 @@ export class ChangeNameFormComponent extends React.Component<IChangeNameProps> {
             onChange={this.handleUserInput}
             error={this.state.nameError}
             required={true}
-            disabled={this.props.isExternalProviderAccount}
             type={"text"}
             value={this.state.name}
             placeholder={"Enter Name"}
@@ -49,7 +47,7 @@ export class ChangeNameFormComponent extends React.Component<IChangeNameProps> {
           <div className="w3-panel">
             <button
               type="submit"
-              disabled={!this.state.nameValid || this.props.isExternalProviderAccount}
+              disabled={!this.state.nameValid}
               className="w3-btn w3-green"
             >
               Change Name

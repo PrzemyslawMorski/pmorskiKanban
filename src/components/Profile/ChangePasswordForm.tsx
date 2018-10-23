@@ -11,7 +11,6 @@ import EmailAuthProvider = firebase.auth.EmailAuthProvider;
 
 interface IChangePasswordProps {
   user: IUser | null;
-  isExternalProviderAccount: boolean;
 }
 
 export class ChangePasswordFormComponent extends React.Component<IChangePasswordProps> {
@@ -47,7 +46,6 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
             onChange={this.handleUserInput}
             error={this.state.formErrors.currentPassword}
             required={true}
-            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             value={this.state.currentPassword}
             placeholder={"Enter current password"}
@@ -59,7 +57,6 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
             onChange={this.handleUserInput}
             error={this.state.formErrors.newPassword}
             required={true}
-            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             value={this.state.newPassword}
             placeholder={"Enter new password"}
@@ -71,7 +68,6 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
             onChange={this.handleUserInput}
             error={this.state.formErrors.repeatNewPassword}
             required={true}
-            disabled={this.props.isExternalProviderAccount}
             type={"password"}
             value={this.state.repeatNewPassword}
             placeholder={"Repeat new password"}
@@ -80,7 +76,7 @@ export class ChangePasswordFormComponent extends React.Component<IChangePassword
           <div className="w3-panel">
             <button
               type="submit"
-              disabled={!this.state.formValid || this.props.isExternalProviderAccount}
+              disabled={!this.state.formValid}
               className="w3-btn w3-green"
             >
               Change Password
