@@ -13,6 +13,8 @@
 **/*.swp
 **/*.swo
 
+**/*.d.ts
+
 **/firebase.ts
 **/firebase.d.ts
 **/firebase.js
