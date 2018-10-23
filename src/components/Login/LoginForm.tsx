@@ -1,10 +1,9 @@
 import * as _ from "lodash";
 import * as React from "react";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {IErrorResponse, ILoginRequest} from "../../dtos/auth";
 import {loginUser} from "../../services/authService";
-import {Checkbox, InputField} from "../../shared-components/InputField";
+import {InputField} from "../../shared-components/InputField";
 
 export class LoginForm extends React.Component {
   public state = {
@@ -12,10 +11,8 @@ export class LoginForm extends React.Component {
     emailValid: false,
     formErrors: {email: "", password: ""},
     formValid: false,
-    loggedInSuccessfully: false,
     password: "",
     passwordValid: false,
-    rememberMe: false,
   };
 
   constructor(props: any, context: any) {
@@ -31,16 +28,14 @@ export class LoginForm extends React.Component {
   }
 
   public render() {
-    if (this.state.loggedInSuccessfully) {
-      return <Redirect to="/"/>;
-    }
-
     return (<form onSubmit={this.handleSubmit}>
       <div className="container">
 
         <div className={"w3-container w3-border w3-border-gray w3-margin"}>
-          <h1>Sign In</h1>
+          <h3>Sign In</h3>
           <p>Please fill in this form to log in.</p>
+          <p><b>Note that signing in with a third party provider creates a new account. Separate from your standard
+            email/password one.</b></p>
         </div>
 
         <InputField
@@ -62,8 +57,6 @@ export class LoginForm extends React.Component {
           type={"password"}
           placeholder={"Enter Password"}
         />
-
-        <Checkbox name={"rememberMe"} label={"Remember me"} onChange={this.handleUserInput}/>
       </div>
 
       <div className="w3-panel">
@@ -85,16 +78,10 @@ export class LoginForm extends React.Component {
 
   private handleUserInput(event: React.FormEvent) {
     const name = (event.target as HTMLInputElement).name;
-    const isRememberMe = (event.target as HTMLInputElement).name === "rememberMe";
-
-    const value = isRememberMe ? (event.target as HTMLInputElement).checked : (event.target as HTMLInputElement).value;
-    if (isRememberMe) {
-      this.setState({[name]: value});
-    } else {
-      this.setState({[name]: value}, () => {
-        this.validateField(name, value as string);
-      });
-    }
+    const value = (event.target as HTMLInputElement).value;
+    this.setState({[name]: value}, () => {
+      this.validateField(name, value as string);
+    });
   }
 
   private validateField(fieldName: string, value: string) {
@@ -153,9 +140,7 @@ export class LoginForm extends React.Component {
       email: this.state.email,
       password: this.state.password,
     };
-    loginUser(loginRequest).subscribe(() => {
-        this.setState({loggedInSuccessfully: true});
-      },
+    loginUser(loginRequest).subscribe(undefined,
       (error: IErrorResponse) => {
         let emailValid = this.state.emailValid;
         let passwordValid = this.state.passwordValid;

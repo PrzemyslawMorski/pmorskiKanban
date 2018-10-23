@@ -1,10 +1,11 @@
 import * as firebase from "firebase";
 import {Observable, Observer} from "rxjs";
-import {IErrorResponse, ILoginRequest, ILoginResponse, IRegisterRequest, IRegisterResponse} from "../dtos/auth";
+import {IErrorResponse, ILoginRequest, IRegisterRequest} from "../dtos/auth";
 import HttpsCallableResult = firebase.functions.HttpsCallableResult;
+import {IUser} from "../entities/IUser";
 
-export const registerUser = (request: IRegisterRequest): Observable<IRegisterResponse> => {
-  return Observable.create((observer: Observer<IRegisterResponse>) => {
+export const registerUser = (request: IRegisterRequest): Observable<IUser> => {
+  return Observable.create((observer: Observer<IUser>) => {
     firebase.auth().createUserWithEmailAndPassword(request.email, request.password)
       .then((response: firebase.auth.UserCredential) => {
         response!.user!.sendEmailVerification()
@@ -15,26 +16,37 @@ export const registerUser = (request: IRegisterRequest): Observable<IRegisterRes
                 response!.user!.updateProfile({
                   displayName: request.name,
                   photoURL: gravatarUrl.data as string,
-                }).then(() => {
-                  observer.complete();
-                }).catch((error: firebase.auth.Error) => {
-                  const errorResponse: IErrorResponse = {
-                    error: "Your account was created but something went wrong when setting your username. " +
-                      "You can log in but please contact our support staff.",
-                    errorCode: error.code,
-                  };
-                  observer.error(errorResponse);
-                });
+                })
+                  .then(() => {
+                    const user: IUser = {
+                      displayName: request.name,
+                      email: request.email,
+                      photoURL: gravatarUrl.data as string,
+                      uid: response!.user!.uid,
+                    };
+                    observer.next(user);
+                    observer.complete();
+                  })
+                  .catch((error: firebase.auth.Error) => {
+                    const errorResponse: IErrorResponse = {
+                      error: "Your account was created but something went wrong when setting your username. " +
+                        "You can log in but please contact our support staff.",
+                      errorCode: error.code,
+                    };
+                    observer.error(errorResponse);
+                    observer.complete();
+                  });
               });
           })
           .catch((error: firebase.auth.Error) => {
             const errorResponse: IErrorResponse = {
               error: "Your account was created but something went wrong " +
-                "when sending you an email confirmation email. " +
+                "when sending you an email verification email. " +
                 "You can log in but please contact our support staff.",
               errorCode: error.code,
             };
             observer.error(errorResponse);
+            observer.complete();
           });
       })
       .catch((error: firebase.auth.Error) => {
@@ -43,35 +55,19 @@ export const registerUser = (request: IRegisterRequest): Observable<IRegisterRes
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
 
-export const loginUser = (request: ILoginRequest): Observable<ILoginResponse> => {
-  return Observable.create((observer: Observer<ILoginResponse | IErrorResponse>) => {
+export const loginUser = (request: ILoginRequest): Observable<void> => {
+  return Observable.create((observer: Observer<void>) => {
     firebase.auth().signInWithEmailAndPassword(request.email, request.password)
       .then((response: firebase.auth.UserCredential) => {
-        if (!response!.user!.emailVerified) {
+        if (response!.user!.emailVerified === false) {
           alert("Please verify your email.");
         }
-        response!.user!.getIdToken()
-          .then((token: string) => {
-            const loginResponse: ILoginResponse = {
-              accessToken: token,
-              email: response!.user!.email!,
-              photoURL: response!.user!.photoURL!,
-              uid: response!.user!.uid,
-              username: response!.user!.displayName!,
-            };
-            observer.next(loginResponse);
-          })
-          .catch((error: firebase.auth.Error) => {
-            const errorResponse: IErrorResponse = {
-              error: error.message.toString(),
-              errorCode: error.code,
-            };
-            observer.error(errorResponse);
-          });
+        observer.complete();
       })
       .catch((error: firebase.auth.Error) => {
         const errorResponse: IErrorResponse = {
@@ -79,11 +75,12 @@ export const loginUser = (request: ILoginRequest): Observable<ILoginResponse> =>
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
 
-export const forgotPassword = (email: string): Observable<null | IErrorResponse> => {
+export const forgotPassword = (email: string): Observable<void> => {
   return Observable.create((observer: Observer<null | IErrorResponse>) => {
     firebase.auth().sendPasswordResetEmail(email)
       .then(() => observer.complete())
@@ -93,12 +90,13 @@ export const forgotPassword = (email: string): Observable<null | IErrorResponse>
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
   });
 };
 
-export const logoutUser = (): Observable<null | IErrorResponse> => {
-  return Observable.create((observer: Observer<null | IErrorResponse>) => {
+export const logoutUser = (): Observable<void> => {
+  return Observable.create((observer: Observer<void>) => {
     firebase.auth().signOut()
       .then(() => {
         observer.complete();
@@ -109,6 +107,33 @@ export const logoutUser = (): Observable<null | IErrorResponse> => {
           errorCode: error.code,
         };
         observer.error(errorResponse);
+        observer.complete();
       });
+  });
+};
+
+export const changeUserName = (newName: string): Observable<void> => {
+  return Observable.create((observer: Observer<void>) => {
+    const user = firebase.auth().currentUser;
+    if (user !== null) {
+      user.updateProfile({
+        displayName: newName,
+        photoURL: user.photoURL,
+      })
+        .then(() => {
+          observer.complete();
+        })
+        .catch((error: firebase.auth.Error) => {
+          const errorResponse: IErrorResponse = {
+            error: error.message,
+            errorCode: error.code,
+          };
+          observer.error(errorResponse);
+          observer.complete();
+        });
+    } else {
+      alert("Please sign in to change your name.");
+      observer.complete();
+    }
   });
 };

@@ -1,13 +1,21 @@
 import * as _ from "lodash";
 import * as React from "react";
 import {connect} from "react-redux";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
+import {Dispatch} from "redux";
+import {userData} from "../../actions/userActions";
 import {IErrorResponse, IRegisterRequest} from "../../dtos/auth";
+import {IUser} from "../../entities/IUser";
 import {registerUser} from "../../services/authService";
-import {Checkbox, InputField} from "../../shared-components/InputField";
+import {InputField} from "../../shared-components/InputField";
+import {IState} from "../../store/storeStateInterface";
 
-class RegisterFormComponent extends React.Component {
+interface IRegisterFormProps {
+  user: IUser | null;
+  registered: (user: IUser) => void;
+}
+
+class RegisterFormComponent extends React.Component<IRegisterFormProps, any> {
   public state = {
     confirmPassword: "",
     confirmPasswordValid: false,
@@ -19,8 +27,6 @@ class RegisterFormComponent extends React.Component {
     nameValid: false,
     password: "",
     passwordValid: false,
-    registeredSuccessfully: false,
-    rememberMe: false,
   };
 
   constructor(props: any, context: any) {
@@ -34,15 +40,13 @@ class RegisterFormComponent extends React.Component {
   }
 
   public render() {
-    if (this.state.registeredSuccessfully) {
-      return <Redirect to="/login"/>;
-    }
-
     return (
       <form className="w3-container w3-panel w3-padding-large w3-center" onSubmit={this.handleSubmit}>
         <div className={"w3-container w3-border w3-border-gray w3-margin"}>
-          <h1>Sign Up</h1>
+          <h3>Sign Up</h3>
           <p>Please fill in this form to create an account.</p>
+          <p><b>Note that signing in with a third party provider creates a new account. Separate from your standard
+            email/password one.</b></p>
         </div>
 
         <InputField
@@ -85,8 +89,6 @@ class RegisterFormComponent extends React.Component {
           placeholder={"Repeat Password"}
         />
 
-        <Checkbox name={"rememberMe"} label={"Remember me"} onChange={this.handleUserInput}/>
-
         <div className="w3-panel">
           <Link to="/">
             <button type="button" className="w3-btn w3-red">Cancel</button>
@@ -98,16 +100,10 @@ class RegisterFormComponent extends React.Component {
 
   private handleUserInput(event: React.FormEvent) {
     const name = (event.target as HTMLInputElement).name;
-    const isRememberMe = (event.target as HTMLInputElement).name === "rememberMe";
-
-    const value = isRememberMe ? (event.target as HTMLInputElement).checked : (event.target as HTMLInputElement).value;
-    if (isRememberMe) {
-      this.setState({[name]: value});
-    } else {
-      this.setState({[name]: value}, () => {
-        this.validateField(name, value as string);
-      });
-    }
+    const value = (event.target as HTMLInputElement).value;
+    this.setState({[name]: value}, () => {
+      this.validateField(name, value as string);
+    });
   }
 
   private validateField(fieldName: string, value: string) {
@@ -202,7 +198,10 @@ class RegisterFormComponent extends React.Component {
 
     registerUser(registerRequest)
       .subscribe(
-        undefined,
+        (user: IUser) => {
+          this.props.registered(user);
+          alert("A verification email has been sent to your email address.");
+        },
         (error: IErrorResponse) => {
           let emailValid = this.state.emailValid;
           let passwordValid = this.state.passwordValid;
@@ -224,12 +223,16 @@ class RegisterFormComponent extends React.Component {
             formErrors: fieldValidationErrors,
             passwordValid,
           }, this.validateForm);
-        },
-        () => {
-          this.setState({registeredSuccessfully: true});
-          alert("A verification email was sent to your email address.");
         });
   }
 }
 
-export const RegisterForm = connect()(RegisterFormComponent);
+const mapStateToProps = (state: IState) => ({
+  user: state.user,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  registered: (user: IUser) => dispatch(userData(user)),
+});
+
+export const RegisterForm = connect(mapStateToProps, mapDispatchToProps)(RegisterFormComponent);

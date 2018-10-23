@@ -7,8 +7,12 @@ interface INavbarUserProps {
 }
 
 export const NavbarUser: React.SFC<INavbarUserProps> = (props) => {
-  if (props.photoUrl === null && props.photoUrl === "" || props.userName === null && props.userName === "") {
-    return null;
+  debugger;
+  if (props.photoUrl === null || props.photoUrl === "" || props.userName === null || props.userName === "") {
+    return (<div>
+        <span>Account</span>
+      </div>
+    );
   } else {
     return (<div>
         <UserMiniature photoUrl={props.photoUrl}/>

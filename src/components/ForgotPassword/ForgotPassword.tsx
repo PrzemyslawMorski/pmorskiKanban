@@ -1,12 +1,12 @@
-import * as firebase from "firebase";
 import * as React from "react";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
+import {IUser} from "../../entities/IUser";
 import {IState} from "../../store/storeStateInterface";
 import {ForgotPasswordForm} from "./ForgotPasswordForm";
 
 interface IForgotPasswordProps {
-  user: firebase.User | null;
+  user: IUser | null;
 }
 
 export class ForgotPasswordPage extends React.Component<IForgotPasswordProps, any> {

@@ -32,8 +32,8 @@ export class ForgotPasswordForm extends React.Component {
 
     return (
       <form className="w3-container w3-panel w3-padding-large w3-center" onSubmit={this.handleSubmit}>
-        <div className={"w3-container w3-border w3-border-gray w3-margin"}>
-          <h1>Forgot password</h1>
+        <div className={"w3-container w3-border w3-border-gray"}>
+          <h3>Forgot password</h3>
           <p>Please fill in this form to receive a password reset link.</p>
         </div>
 
