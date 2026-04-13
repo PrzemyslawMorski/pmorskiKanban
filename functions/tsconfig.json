@@ -3,6 +3,7 @@
     "lib": ["es6"],
     "module": "commonjs",
     "noImplicitReturns": true,
+    "rootDir": "src",
     "outDir": "lib",
     "sourceMap": true,
     "target": "es6"
